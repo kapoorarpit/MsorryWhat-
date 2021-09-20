@@ -1,24 +1,24 @@
 // new speech recognition object
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 var recognition = new SpeechRecognition();
-
-
+            
 // This runs when the speech recognition service starts
-recognition.onstart = function() {
-    console.log("We are listening. Try speaking into the microphone.");
-};
 
-recognition.onspeechend = function() {
-    // when user is done speaking
-    //recognition.stop();
-}
-              
+
+var content = ""         
 // This runs when the speech recognition service returns result
 recognition.onresult = function(event) {
-    var transcript = event.results[0][0].transcript;
-    console.log(transcript)
-    document.getElementById("result").textContent = transcript; 
+    var transcript 
+    var current = event.resultIndex;
+
+    transcript = event.results[current][0].transcript;
+
+    content +=transcript;
+    console.log(content)
 };
-            
+              
 // start recognition
+
+recognition.continuous = true;
+recognition.interimResults = true;
 recognition.start();
