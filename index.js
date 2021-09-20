@@ -1,8 +1,6 @@
 // new speech recognition object
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 var recognition = new SpeechRecognition();
-            
-// This runs when the speech recognition service starts
 
 
 var content = ""         
@@ -13,12 +11,16 @@ recognition.onresult = function(event) {
 
     transcript = event.results[current][0].transcript;
 
-    content +=transcript;
+    content+=transcript;
+    document.getElementById("instructions").textContent=content
     console.log(content)
 };
-              
-// start recognition
+
+
+recognition.onend = function() {
+    console.log('Speech recognition service disconnected');
+    recognition.start();
+}
 
 recognition.continuous = true;
-recognition.interimResults = true;
 recognition.start();
