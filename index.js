@@ -28,14 +28,14 @@ recognition.start();
 var username=""
 var contact=""
 var item=""
-var notify="Please Submit details to get notification on your mobile number"
-document.getElementById("notify").innerText=notify
+document.getElementById("notify").innerText="Please Submit details to get notification on your mobile number"
 
 var submit = document.getElementById("submit").addEventListener("click",function(event){
-    username=document.getElementById("user_name").innerText
-    contact=document.getElementById("phone_number").textContent
-    item=document.getElementById("item").textContent
+    username=document.getElementById("user_name").value.trim()
+    contact=document.getElementById("phone_number").value.trim()
+    item=document.getElementById("item").value.trim()
     window.console.log(username)
     console.log(contact)
     console.log(item)
-})
+    document.getElementById("notify").innerText="Hi "+ username +"! You'll get a text message on "+ contact +
+                                                " whenever '" + item +"' will be called in the meeting "})
