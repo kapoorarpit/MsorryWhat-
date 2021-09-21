@@ -43,16 +43,16 @@
 						</span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-						<input class="input100" type="text" name="phone_number" id="phone_number" placeholder="Phone number to receive sms">
+					<div class="wrap-input100 validate-input" data-validate = "phone number is required">
+						<input class="input100" type="tel" pattern="[0-9]{3}[0-9]{4}[0-9]{3}" name="phone_number" id="phone_number" placeholder="Phone number to receive sms">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-envelope" aria-hidden="true"></i>
 						</span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate = "Message is required">
-						<input class="input100" name="target" placeholder="Add item to listen">
+					<div class="wrap-input100 validate-input" data-validate = "item is required">
+						<input class="input100" name="target" placeholder="Add item to listen" id="item">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-thumb-tack" aria-hidden="true"></i>
@@ -60,15 +60,20 @@
 					</div>
 
 					<div class="container-contact100-form-btn">
-						<button class="contact100-form-btn">
-							Submit
+						<button class="contact100-form-btn" id="submit">
+							submit
 						</button>
 					</div>
 				</form>
                 <div class="container-contact100-form-btn">
-                    <span class="contact100-form-title">
+                    <span class="contact100-form-title" id="notify">
                         Please Submit details to get notification on your mobile number
                     </span>
+                </div>
+                <div class="container-contact100-form-btn">
+                    <button class="contact100-form-btn mz" id="listen">
+                        listen
+                    </button>
                 </div>
 			</div>
 		</div>
@@ -76,7 +81,7 @@
 
 
 
-
+	<script src="index.js"></script>
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
