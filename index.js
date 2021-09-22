@@ -10,7 +10,10 @@ recognition.onresult = function(event) {
     var current = event.resultIndex;
 
     transcript = event.results[current][0].transcript;
-
+    if(transcript.includes(item.charAt(0).toUpperCase()+item.slice(1)
+    ||
+    item.charAt(0).toLowerCase()+item.slice(1)))
+    {console.log("item found")}
     content+=transcript;
     console.log(content)
 };
@@ -31,20 +34,15 @@ var submit = document.getElementById("submit").addEventListener("click",function
     if(!validate(username,contact,item)){return}
     if(!phonenumber(contact))
     {return}
+    if(item.includes(" "))
+    {alert("Enter item one a time");return}
     window.console.log(username)
     console.log(contact)
     console.log(item)
     document.getElementById("notify").innerHTML="Hi "+ username +"! You'll get a text message on "+ contact +
-                                                " whenever '" + item.bold() +"' will be called in the meeting "
+                                                " whenever '" + item +"' will be called in the meeting "
     submitted=true;
 })
-
-
-/*
-document.getElementById('listen').addEventListener('click',function(event){
-    console.log("yes it worked")
-})*/
-
 
 var listening_desired=true
 
