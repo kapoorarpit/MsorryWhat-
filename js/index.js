@@ -13,7 +13,8 @@ recognition.onresult = function(event) {
     if(transcript.includes(item.charAt(0).toUpperCase()+item.slice(1)
     ||
     item.charAt(0).toLowerCase()+item.slice(1)))
-    {notify("Hi "+ username +" thanks for using MsorryWhat?? \n Someone called you in the meeting")}
+    {notify("Hi "+ username +" thanks for using MsorryWhat?? \n Someone called you in the meeting",contact)
+    console.log("item found")}
     content+=transcript;
     console.log(content)
 };
@@ -27,7 +28,7 @@ var item=""
 document.getElementById("notify").innerText="Please Submit details to get notification on your mobile number"
 
 var submitted=false;
-var submit = document.getElementById("submit").addEventListener("click",function(event){
+document.getElementById("submit").addEventListener("click",function(event){
     username=document.getElementById("user_name").value.trim()
     contact=document.getElementById("phone_number").value.trim()
     item=document.getElementById("item").value.trim()
@@ -36,6 +37,7 @@ var submit = document.getElementById("submit").addEventListener("click",function
     {return}
     if(item.includes(" "))
     {alert("Enter item one a time");return}
+    username =username.charAt(0).toUpperCase()+username.slice(1)
     window.console.log(username)
     console.log(contact)
     console.log(item)
