@@ -13,7 +13,7 @@ recognition.onresult = function(event) {
     if(transcript.includes(item.charAt(0).toUpperCase()+item.slice(1)
     ||
     item.charAt(0).toLowerCase()+item.slice(1)))
-    {console.log("item found")}
+    {notify("Hi "+ username +" thanks for using MsorryWhat?? \n Someone called you in the meeting")}
     content+=transcript;
     console.log(content)
 };
@@ -99,3 +99,27 @@ function validate(username, contact, item){
     }
     return true
 }
+
+function notify(message,contact){
+var unirest = require("unirest");
+
+var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2");
+
+require('dotenv').config()
+
+req.headers({
+  "authorization": process.env.API_KEY
+});
+
+req.form({
+  "message": message,
+  "language": "english",
+  "route": "q",
+  "numbers": contact,
+});
+
+req.end(function (res) {
+  if (res.error) throw new Error(res.error);
+
+  console.log(res.body);
+});}
