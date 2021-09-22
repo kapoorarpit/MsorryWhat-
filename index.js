@@ -2,7 +2,6 @@
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 var recognition = new SpeechRecognition();
 
-
 var content = ""         
 // This runs when the speech recognition service returns result
 recognition.onresult = function(event) {
@@ -103,8 +102,8 @@ function validate(username, contact, item){
 }
 
 function notify(message,contact){
-var unirest = require("unirest");
 
+var unirest = require("unirest");
 var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2");
 
 require('dotenv').config()
