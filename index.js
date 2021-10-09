@@ -103,13 +103,14 @@ function validate(username, contact, item){
 
 function notify(message,contact){
 
-var unirest = require("unirest");
-var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2");
+var unirest = (require("unirest"));
 
-require('dotenv').config()
+var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
+
+//require('dotenv').config()
 
 req.headers({
-  "authorization": process.env.API_KEY
+  "authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
 });
 
 req.form({
