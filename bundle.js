@@ -39578,8 +39578,17 @@ var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
 
 req.headers({
   "authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
-  'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+  "Access-Control-Allow-Methods": "*"
 });
+
+const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
+}
+
+req.use(cors(corsOptions))
 
 req.form({
   "message": message,
@@ -39593,7 +39602,7 @@ req.end(function (res) {
 
   console.log(res.body);
 });}
-},{"unirest":383}],257:[function(require,module,exports){
+},{"cors":311,"unirest":385}],257:[function(require,module,exports){
 'use strict';
 
 var compileSchema = require('./compile')
@@ -40101,7 +40110,7 @@ function setLogger(self) {
 
 function noop() {}
 
-},{"./cache":258,"./compile":262,"./compile/async":259,"./compile/error_classes":260,"./compile/formats":261,"./compile/resolve":263,"./compile/rules":264,"./compile/schema_obj":265,"./compile/util":267,"./data":268,"./keyword":296,"./refs/data.json":297,"./refs/json-schema-draft-07.json":299,"fast-json-stable-stringify":318}],258:[function(require,module,exports){
+},{"./cache":258,"./compile":262,"./compile/async":259,"./compile/error_classes":260,"./compile/formats":261,"./compile/resolve":263,"./compile/rules":264,"./compile/schema_obj":265,"./compile/util":267,"./data":268,"./keyword":296,"./refs/data.json":297,"./refs/json-schema-draft-07.json":299,"fast-json-stable-stringify":319}],258:[function(require,module,exports){
 'use strict';
 
 
@@ -40790,7 +40799,7 @@ function vars(arr, statement) {
   return code;
 }
 
-},{"../dotjs/validate":295,"./error_classes":260,"./resolve":263,"./util":267,"fast-deep-equal":317,"fast-json-stable-stringify":318}],263:[function(require,module,exports){
+},{"../dotjs/validate":295,"./error_classes":260,"./resolve":263,"./util":267,"fast-deep-equal":318,"fast-json-stable-stringify":319}],263:[function(require,module,exports){
 'use strict';
 
 var URI = require('uri-js')
@@ -41062,7 +41071,7 @@ function resolveIds(schema) {
   return localRefs;
 }
 
-},{"./schema_obj":265,"./util":267,"fast-deep-equal":317,"json-schema-traverse":343,"uri-js":434}],264:[function(require,module,exports){
+},{"./schema_obj":265,"./util":267,"fast-deep-equal":318,"json-schema-traverse":344,"uri-js":436}],264:[function(require,module,exports){
 'use strict';
 
 var ruleModules = require('../dotjs')
@@ -41404,7 +41413,7 @@ function unescapeJsonPointer(str) {
   return str.replace(/~1/g, '/').replace(/~0/g, '~');
 }
 
-},{"./ucs2length":266,"fast-deep-equal":317}],268:[function(require,module,exports){
+},{"./ucs2length":266,"fast-deep-equal":318}],268:[function(require,module,exports){
 'use strict';
 
 var KEYWORDS = [
@@ -45599,7 +45608,7 @@ Reader.prototype._readTag = function (tag) {
 
 module.exports = Reader;
 
-},{"./errors":300,"./types":303,"assert":17,"safer-buffer":355}],303:[function(require,module,exports){
+},{"./errors":300,"./types":303,"assert":17,"safer-buffer":357}],303:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 
@@ -45956,7 +45965,7 @@ Writer.prototype._ensure = function (len) {
 
 module.exports = Writer;
 
-},{"./errors":300,"./types":303,"assert":17,"safer-buffer":355}],305:[function(require,module,exports){
+},{"./errors":300,"./types":303,"assert":17,"safer-buffer":357}],305:[function(require,module,exports){
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 // If you have no idea what ASN.1 or BER is, see this:
@@ -48138,7 +48147,7 @@ module.exports = {
       pbkdf: bcrypt_pbkdf
 };
 
-},{"tweetnacl":382}],310:[function(require,module,exports){
+},{"tweetnacl":384}],310:[function(require,module,exports){
 (function (Buffer){(function (){
 var util = require('util');
 var Stream = require('stream').Stream;
@@ -48330,7 +48339,247 @@ CombinedStream.prototype._emitError = function(err) {
 };
 
 }).call(this)}).call(this,{"isBuffer":require("C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"delayed-stream":311,"stream":212,"util":253}],311:[function(require,module,exports){
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"delayed-stream":312,"stream":212,"util":253}],311:[function(require,module,exports){
+(function () {
+
+  'use strict';
+
+  var assign = require('object-assign');
+  var vary = require('vary');
+
+  var defaults = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+  };
+
+  function isString(s) {
+    return typeof s === 'string' || s instanceof String;
+  }
+
+  function isOriginAllowed(origin, allowedOrigin) {
+    if (Array.isArray(allowedOrigin)) {
+      for (var i = 0; i < allowedOrigin.length; ++i) {
+        if (isOriginAllowed(origin, allowedOrigin[i])) {
+          return true;
+        }
+      }
+      return false;
+    } else if (isString(allowedOrigin)) {
+      return origin === allowedOrigin;
+    } else if (allowedOrigin instanceof RegExp) {
+      return allowedOrigin.test(origin);
+    } else {
+      return !!allowedOrigin;
+    }
+  }
+
+  function configureOrigin(options, req) {
+    var requestOrigin = req.headers.origin,
+      headers = [],
+      isAllowed;
+
+    if (!options.origin || options.origin === '*') {
+      // allow any origin
+      headers.push([{
+        key: 'Access-Control-Allow-Origin',
+        value: '*'
+      }]);
+    } else if (isString(options.origin)) {
+      // fixed origin
+      headers.push([{
+        key: 'Access-Control-Allow-Origin',
+        value: options.origin
+      }]);
+      headers.push([{
+        key: 'Vary',
+        value: 'Origin'
+      }]);
+    } else {
+      isAllowed = isOriginAllowed(requestOrigin, options.origin);
+      // reflect origin
+      headers.push([{
+        key: 'Access-Control-Allow-Origin',
+        value: isAllowed ? requestOrigin : false
+      }]);
+      headers.push([{
+        key: 'Vary',
+        value: 'Origin'
+      }]);
+    }
+
+    return headers;
+  }
+
+  function configureMethods(options) {
+    var methods = options.methods;
+    if (methods.join) {
+      methods = options.methods.join(','); // .methods is an array, so turn it into a string
+    }
+    return {
+      key: 'Access-Control-Allow-Methods',
+      value: methods
+    };
+  }
+
+  function configureCredentials(options) {
+    if (options.credentials === true) {
+      return {
+        key: 'Access-Control-Allow-Credentials',
+        value: 'true'
+      };
+    }
+    return null;
+  }
+
+  function configureAllowedHeaders(options, req) {
+    var allowedHeaders = options.allowedHeaders || options.headers;
+    var headers = [];
+
+    if (!allowedHeaders) {
+      allowedHeaders = req.headers['access-control-request-headers']; // .headers wasn't specified, so reflect the request headers
+      headers.push([{
+        key: 'Vary',
+        value: 'Access-Control-Request-Headers'
+      }]);
+    } else if (allowedHeaders.join) {
+      allowedHeaders = allowedHeaders.join(','); // .headers is an array, so turn it into a string
+    }
+    if (allowedHeaders && allowedHeaders.length) {
+      headers.push([{
+        key: 'Access-Control-Allow-Headers',
+        value: allowedHeaders
+      }]);
+    }
+
+    return headers;
+  }
+
+  function configureExposedHeaders(options) {
+    var headers = options.exposedHeaders;
+    if (!headers) {
+      return null;
+    } else if (headers.join) {
+      headers = headers.join(','); // .headers is an array, so turn it into a string
+    }
+    if (headers && headers.length) {
+      return {
+        key: 'Access-Control-Expose-Headers',
+        value: headers
+      };
+    }
+    return null;
+  }
+
+  function configureMaxAge(options) {
+    var maxAge = (typeof options.maxAge === 'number' || options.maxAge) && options.maxAge.toString()
+    if (maxAge && maxAge.length) {
+      return {
+        key: 'Access-Control-Max-Age',
+        value: maxAge
+      };
+    }
+    return null;
+  }
+
+  function applyHeaders(headers, res) {
+    for (var i = 0, n = headers.length; i < n; i++) {
+      var header = headers[i];
+      if (header) {
+        if (Array.isArray(header)) {
+          applyHeaders(header, res);
+        } else if (header.key === 'Vary' && header.value) {
+          vary(res, header.value);
+        } else if (header.value) {
+          res.setHeader(header.key, header.value);
+        }
+      }
+    }
+  }
+
+  function cors(options, req, res, next) {
+    var headers = [],
+      method = req.method && req.method.toUpperCase && req.method.toUpperCase();
+
+    if (method === 'OPTIONS') {
+      // preflight
+      headers.push(configureOrigin(options, req));
+      headers.push(configureCredentials(options, req));
+      headers.push(configureMethods(options, req));
+      headers.push(configureAllowedHeaders(options, req));
+      headers.push(configureMaxAge(options, req));
+      headers.push(configureExposedHeaders(options, req));
+      applyHeaders(headers, res);
+
+      if (options.preflightContinue) {
+        next();
+      } else {
+        // Safari (and potentially other browsers) need content-length 0,
+        //   for 204 or they just hang waiting for a body
+        res.statusCode = options.optionsSuccessStatus;
+        res.setHeader('Content-Length', '0');
+        res.end();
+      }
+    } else {
+      // actual response
+      headers.push(configureOrigin(options, req));
+      headers.push(configureCredentials(options, req));
+      headers.push(configureExposedHeaders(options, req));
+      applyHeaders(headers, res);
+      next();
+    }
+  }
+
+  function middlewareWrapper(o) {
+    // if options are static (either via defaults or custom options passed in), wrap in a function
+    var optionsCallback = null;
+    if (typeof o === 'function') {
+      optionsCallback = o;
+    } else {
+      optionsCallback = function (req, cb) {
+        cb(null, o);
+      };
+    }
+
+    return function corsMiddleware(req, res, next) {
+      optionsCallback(req, function (err, options) {
+        if (err) {
+          next(err);
+        } else {
+          var corsOptions = assign({}, defaults, options);
+          var originCallback = null;
+          if (corsOptions.origin && typeof corsOptions.origin === 'function') {
+            originCallback = corsOptions.origin;
+          } else if (corsOptions.origin) {
+            originCallback = function (origin, cb) {
+              cb(null, corsOptions.origin);
+            };
+          }
+
+          if (originCallback) {
+            originCallback(req.headers.origin, function (err2, origin) {
+              if (err2 || !origin) {
+                next(err2);
+              } else {
+                corsOptions.origin = origin;
+                cors(corsOptions, req, res, next);
+              }
+            });
+          } else {
+            next();
+          }
+        }
+      });
+    };
+  }
+
+  // can pass either an options hash, an options delegate, or nothing
+  module.exports = middlewareWrapper;
+
+}());
+
+},{"object-assign":352,"vary":437}],312:[function(require,module,exports){
 var Stream = require('stream').Stream;
 var util = require('util');
 
@@ -48431,7 +48680,7 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
   this.emit('error', new Error(message));
 };
 
-},{"stream":212,"util":253}],312:[function(require,module,exports){
+},{"stream":212,"util":253}],313:[function(require,module,exports){
 var crypto = require("crypto");
 var BigInteger = require("jsbn").BigInteger;
 var ECPointFp = require("./lib/ec.js").ECPointFp;
@@ -48491,7 +48740,7 @@ exports.ECKey = function(curve, key, isPublic)
 }
 
 
-},{"./lib/ec.js":313,"./lib/sec.js":314,"crypto":82,"jsbn":342,"safer-buffer":355}],313:[function(require,module,exports){
+},{"./lib/ec.js":314,"./lib/sec.js":315,"crypto":82,"jsbn":343,"safer-buffer":357}],314:[function(require,module,exports){
 // Basic Javascript Elliptic Curve implementation
 // Ported loosely from BouncyCastle's Java EC code
 // Only Fp curves implemented for now
@@ -49054,7 +49303,7 @@ var exports = {
 
 module.exports = exports
 
-},{"jsbn":342}],314:[function(require,module,exports){
+},{"jsbn":343}],315:[function(require,module,exports){
 // Named EC curves
 
 // Requires ec.js, jsbn.js, and jsbn2.js
@@ -49226,7 +49475,7 @@ module.exports = {
   "secp256r1":secp256r1
 }
 
-},{"./ec.js":313,"jsbn":342}],315:[function(require,module,exports){
+},{"./ec.js":314,"jsbn":343}],316:[function(require,module,exports){
 'use strict';
 
 var hasOwn = Object.prototype.hasOwnProperty;
@@ -49345,7 +49594,7 @@ module.exports = function extend() {
 	return target;
 };
 
-},{}],316:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 (function (process){(function (){
 /*
  * extsprintf.js: extended POSIX-style sprintf
@@ -49532,7 +49781,7 @@ function dumpException(ex)
 }
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":187,"assert":17,"util":253}],317:[function(require,module,exports){
+},{"_process":187,"assert":17,"util":253}],318:[function(require,module,exports){
 'use strict';
 
 // do not edit .js files directly - edit src/index.jst
@@ -49580,7 +49829,7 @@ module.exports = function equal(a, b) {
   return a!==a && b!==b;
 };
 
-},{}],318:[function(require,module,exports){
+},{}],319:[function(require,module,exports){
 'use strict';
 
 module.exports = function (data, opts) {
@@ -49641,7 +49890,7 @@ module.exports = function (data, opts) {
     })(data);
 };
 
-},{}],319:[function(require,module,exports){
+},{}],320:[function(require,module,exports){
 module.exports = ForeverAgent
 ForeverAgent.SSL = ForeverAgentSSL
 
@@ -49781,7 +50030,7 @@ function createConnectionSSL (port, host, options) {
   return tls.connect(options);
 }
 
-},{"http":227,"https":151,"net":1,"tls":1,"util":253}],320:[function(require,module,exports){
+},{"http":227,"https":151,"net":1,"tls":1,"util":253}],321:[function(require,module,exports){
 (function (process,Buffer){(function (){
 var CombinedStream = require('combined-stream');
 var util = require('util');
@@ -50136,7 +50385,7 @@ function populate(dst, src) {
 }
 
 }).call(this)}).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":187,"async":306,"buffer":71,"combined-stream":310,"fs":1,"http":227,"https":151,"mime-types":350,"path":180,"url":248,"util":253}],321:[function(require,module,exports){
+},{"_process":187,"async":306,"buffer":71,"combined-stream":310,"fs":1,"http":227,"https":151,"mime-types":351,"path":180,"url":248,"util":253}],322:[function(require,module,exports){
 module.exports={
   "$id": "afterRequest.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50168,7 +50417,7 @@ module.exports={
   }
 }
 
-},{}],322:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 module.exports={
   "$id": "beforeRequest.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50200,7 +50449,7 @@ module.exports={
   }
 }
 
-},{}],323:[function(require,module,exports){
+},{}],324:[function(require,module,exports){
 module.exports={
   "$id": "browser.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50222,7 +50471,7 @@ module.exports={
   }
 }
 
-},{}],324:[function(require,module,exports){
+},{}],325:[function(require,module,exports){
 module.exports={
   "$id": "cache.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50245,7 +50494,7 @@ module.exports={
   }
 }
 
-},{}],325:[function(require,module,exports){
+},{}],326:[function(require,module,exports){
 module.exports={
   "$id": "content.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50276,7 +50525,7 @@ module.exports={
   }
 }
 
-},{}],326:[function(require,module,exports){
+},{}],327:[function(require,module,exports){
 module.exports={
   "$id": "cookie.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50314,7 +50563,7 @@ module.exports={
   }
 }
 
-},{}],327:[function(require,module,exports){
+},{}],328:[function(require,module,exports){
 module.exports={
   "$id": "creator.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50336,7 +50585,7 @@ module.exports={
   }
 }
 
-},{}],328:[function(require,module,exports){
+},{}],329:[function(require,module,exports){
 module.exports={
   "$id": "entry.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50391,7 +50640,7 @@ module.exports={
   }
 }
 
-},{}],329:[function(require,module,exports){
+},{}],330:[function(require,module,exports){
 module.exports={
   "$id": "har.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50406,7 +50655,7 @@ module.exports={
   }
 }
 
-},{}],330:[function(require,module,exports){
+},{}],331:[function(require,module,exports){
 module.exports={
   "$id": "header.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50428,7 +50677,7 @@ module.exports={
   }
 }
 
-},{}],331:[function(require,module,exports){
+},{}],332:[function(require,module,exports){
 'use strict'
 
 module.exports = {
@@ -50452,7 +50701,7 @@ module.exports = {
   timings: require('./timings.json')
 }
 
-},{"./afterRequest.json":321,"./beforeRequest.json":322,"./browser.json":323,"./cache.json":324,"./content.json":325,"./cookie.json":326,"./creator.json":327,"./entry.json":328,"./har.json":329,"./header.json":330,"./log.json":332,"./page.json":333,"./pageTimings.json":334,"./postData.json":335,"./query.json":336,"./request.json":337,"./response.json":338,"./timings.json":339}],332:[function(require,module,exports){
+},{"./afterRequest.json":322,"./beforeRequest.json":323,"./browser.json":324,"./cache.json":325,"./content.json":326,"./cookie.json":327,"./creator.json":328,"./entry.json":329,"./har.json":330,"./header.json":331,"./log.json":333,"./page.json":334,"./pageTimings.json":335,"./postData.json":336,"./query.json":337,"./request.json":338,"./response.json":339,"./timings.json":340}],333:[function(require,module,exports){
 module.exports={
   "$id": "log.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50490,7 +50739,7 @@ module.exports={
   }
 }
 
-},{}],333:[function(require,module,exports){
+},{}],334:[function(require,module,exports){
 module.exports={
   "$id": "page.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50524,7 +50773,7 @@ module.exports={
   }
 }
 
-},{}],334:[function(require,module,exports){
+},{}],335:[function(require,module,exports){
 module.exports={
   "$id": "pageTimings.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50544,7 +50793,7 @@ module.exports={
   }
 }
 
-},{}],335:[function(require,module,exports){
+},{}],336:[function(require,module,exports){
 module.exports={
   "$id": "postData.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50589,7 +50838,7 @@ module.exports={
   }
 }
 
-},{}],336:[function(require,module,exports){
+},{}],337:[function(require,module,exports){
 module.exports={
   "$id": "query.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50611,7 +50860,7 @@ module.exports={
   }
 }
 
-},{}],337:[function(require,module,exports){
+},{}],338:[function(require,module,exports){
 module.exports={
   "$id": "request.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50670,7 +50919,7 @@ module.exports={
   }
 }
 
-},{}],338:[function(require,module,exports){
+},{}],339:[function(require,module,exports){
 module.exports={
   "$id": "response.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50726,7 +50975,7 @@ module.exports={
   }
 }
 
-},{}],339:[function(require,module,exports){
+},{}],340:[function(require,module,exports){
 module.exports={
   "$id": "timings.json#",
   "$schema": "http://json-schema.org/draft-06/schema#",
@@ -50770,7 +51019,7 @@ module.exports={
   }
 }
 
-},{}],340:[function(require,module,exports){
+},{}],341:[function(require,module,exports){
 module.exports      = isTypedArray
 isTypedArray.strict = isStrictTypedArray
 isTypedArray.loose  = isLooseTypedArray
@@ -50813,7 +51062,7 @@ function isLooseTypedArray(arr) {
   return names[toString.call(arr)]
 }
 
-},{}],341:[function(require,module,exports){
+},{}],342:[function(require,module,exports){
 var stream = require('stream')
 
 
@@ -50842,7 +51091,7 @@ module.exports.isReadable = isReadable
 module.exports.isWritable = isWritable
 module.exports.isDuplex   = isDuplex
 
-},{"stream":212}],342:[function(require,module,exports){
+},{"stream":212}],343:[function(require,module,exports){
 (function(){
 
     // Copyright (c) 2005  Tom Wu
@@ -52201,7 +52450,7 @@ module.exports.isDuplex   = isDuplex
 
 }).call(this);
 
-},{}],343:[function(require,module,exports){
+},{}],344:[function(require,module,exports){
 'use strict';
 
 var traverse = module.exports = function (schema, opts, cb) {
@@ -52292,7 +52541,7 @@ function escapeJsonPtr(str) {
   return str.replace(/~/g, '~0').replace(/\//g, '~1');
 }
 
-},{}],344:[function(require,module,exports){
+},{}],345:[function(require,module,exports){
 /**
  * JSONSchema Validator - Validates JavaScript objects using JSON Schemas
  *	(http://www.json.com/json-schema-proposal/)
@@ -52567,7 +52816,7 @@ exports.mustBeValid = function(result){
 return exports;
 }));
 
-},{}],345:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 exports = module.exports = stringify
 exports.getSerialize = serializer
 
@@ -52596,7 +52845,7 @@ function serializer(replacer, cycleReplacer) {
   }
 }
 
-},{}],346:[function(require,module,exports){
+},{}],347:[function(require,module,exports){
 /*
  * lib/jsprim.js: utilities for primitive JavaScript types
  */
@@ -53333,7 +53582,7 @@ function mergeObjects(provided, overrides, defaults)
 	return (rv);
 }
 
-},{"assert-plus":347,"extsprintf":316,"json-schema":344,"util":253,"verror":435}],347:[function(require,module,exports){
+},{"assert-plus":348,"extsprintf":317,"json-schema":345,"util":253,"verror":438}],348:[function(require,module,exports){
 (function (Buffer,process){(function (){
 // Copyright (c) 2012, Mark Cavage. All rights reserved.
 // Copyright 2015 Joyent, Inc.
@@ -53548,7 +53797,7 @@ function _setExports(ndebug) {
 module.exports = _setExports(process.env.NODE_NDEBUG);
 
 }).call(this)}).call(this,{"isBuffer":require("C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")},require('_process'))
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"stream":212,"util":253}],348:[function(require,module,exports){
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"stream":212,"util":253}],349:[function(require,module,exports){
 module.exports={
   "application/1d-interleaved-parityfec": {
     "source": "iana"
@@ -59909,7 +60158,7 @@ module.exports={
   }
 }
 
-},{}],349:[function(require,module,exports){
+},{}],350:[function(require,module,exports){
 /*!
  * mime-db
  * Copyright(c) 2014 Jonathan Ong
@@ -59922,7 +60171,7 @@ module.exports={
 
 module.exports = require('./db.json')
 
-},{"./db.json":348}],350:[function(require,module,exports){
+},{"./db.json":349}],351:[function(require,module,exports){
 
 var db = require('mime-db')
 
@@ -59987,7 +60236,9 @@ exports.contentType = function (type) {
   return type
 }
 
-},{"mime-db":349}],351:[function(require,module,exports){
+},{"mime-db":350}],352:[function(require,module,exports){
+arguments[4][163][0].apply(exports,arguments)
+},{"dup":163}],353:[function(require,module,exports){
 (function (process){(function (){
 // Generated by CoffeeScript 1.12.2
 (function() {
@@ -60027,7 +60278,7 @@ exports.contentType = function (type) {
 
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":187}],352:[function(require,module,exports){
+},{"_process":187}],354:[function(require,module,exports){
 module.exports=[
 "ac",
 "com.ac",
@@ -68862,7 +69113,7 @@ module.exports=[
 "virtualserver.io",
 "enterprisecloud.nu"
 ]
-},{}],353:[function(require,module,exports){
+},{}],355:[function(require,module,exports){
 /*eslint no-var:0, prefer-arrow-callback: 0, object-shorthand: 0 */
 'use strict';
 
@@ -69133,11 +69384,11 @@ exports.isValid = function (domain) {
   return Boolean(parsed.domain && parsed.listed);
 };
 
-},{"./data/rules.json":352,"punycode":195}],354:[function(require,module,exports){
+},{"./data/rules.json":354,"punycode":195}],356:[function(require,module,exports){
 arguments[4][202][0].apply(exports,arguments)
-},{"buffer":71,"dup":202}],355:[function(require,module,exports){
+},{"buffer":71,"dup":202}],357:[function(require,module,exports){
 arguments[4][203][0].apply(exports,arguments)
-},{"_process":187,"buffer":71,"dup":203}],356:[function(require,module,exports){
+},{"_process":187,"buffer":71,"dup":203}],358:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 var Buffer = require('safer-buffer').Buffer;
@@ -69307,7 +69558,7 @@ module.exports = {
 	curves: curves
 };
 
-},{"safer-buffer":355}],357:[function(require,module,exports){
+},{"safer-buffer":357}],359:[function(require,module,exports){
 // Copyright 2016 Joyent, Inc.
 
 module.exports = Certificate;
@@ -69719,7 +69970,7 @@ Certificate._oldVersionDetect = function (obj) {
 	return ([1, 0]);
 };
 
-},{"./algs":356,"./errors":360,"./fingerprint":361,"./formats/openssh-cert":364,"./formats/x509":373,"./formats/x509-pem":372,"./identity":374,"./key":376,"./private-key":377,"./signature":378,"./utils":380,"assert-plus":381,"crypto":82,"safer-buffer":355,"util":253}],358:[function(require,module,exports){
+},{"./algs":358,"./errors":362,"./fingerprint":363,"./formats/openssh-cert":366,"./formats/x509":375,"./formats/x509-pem":374,"./identity":376,"./key":378,"./private-key":379,"./signature":380,"./utils":382,"assert-plus":383,"crypto":82,"safer-buffer":357,"util":253}],360:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = {
@@ -70118,7 +70369,7 @@ function generateECDSA(curve) {
 	}
 }
 
-},{"./algs":356,"./key":376,"./private-key":377,"./utils":380,"assert-plus":381,"crypto":82,"ecc-jsbn":312,"ecc-jsbn/lib/ec":313,"jsbn":342,"safer-buffer":355,"tweetnacl":382}],359:[function(require,module,exports){
+},{"./algs":358,"./key":378,"./private-key":379,"./utils":382,"assert-plus":383,"crypto":82,"ecc-jsbn":313,"ecc-jsbn/lib/ec":314,"jsbn":343,"safer-buffer":357,"tweetnacl":384}],361:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -70212,7 +70463,7 @@ Signer.prototype.sign = function () {
 	return (sigObj);
 };
 
-},{"./signature":378,"assert-plus":381,"safer-buffer":355,"stream":212,"tweetnacl":382,"util":253}],360:[function(require,module,exports){
+},{"./signature":380,"assert-plus":383,"safer-buffer":357,"stream":212,"tweetnacl":384,"util":253}],362:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 var assert = require('assert-plus');
@@ -70298,7 +70549,7 @@ module.exports = {
 	CertificateParseError: CertificateParseError
 };
 
-},{"assert-plus":381,"util":253}],361:[function(require,module,exports){
+},{"assert-plus":383,"util":253}],363:[function(require,module,exports){
 // Copyright 2018 Joyent, Inc.
 
 module.exports = Fingerprint;
@@ -70520,7 +70771,7 @@ Fingerprint._oldVersionDetect = function (obj) {
 	return ([1, 0]);
 };
 
-},{"./algs":356,"./certificate":357,"./errors":360,"./key":376,"./private-key":377,"./utils":380,"assert-plus":381,"crypto":82,"safer-buffer":355}],362:[function(require,module,exports){
+},{"./algs":358,"./certificate":359,"./errors":362,"./key":378,"./private-key":379,"./utils":382,"assert-plus":383,"crypto":82,"safer-buffer":357}],364:[function(require,module,exports){
 // Copyright 2018 Joyent, Inc.
 
 module.exports = {
@@ -70646,7 +70897,7 @@ function write(key, options) {
 	throw (new Error('"auto" format cannot be used for writing'));
 }
 
-},{"../key":376,"../private-key":377,"../utils":380,"./dnssec":363,"./pem":365,"./putty":368,"./rfc4253":369,"./ssh":371,"assert-plus":381,"safer-buffer":355}],363:[function(require,module,exports){
+},{"../key":378,"../private-key":379,"../utils":382,"./dnssec":365,"./pem":367,"./putty":370,"./rfc4253":371,"./ssh":373,"assert-plus":383,"safer-buffer":357}],365:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = {
@@ -70935,7 +71186,7 @@ function write(key, options) {
 	}
 }
 
-},{"../dhe":358,"../key":376,"../private-key":377,"../ssh-buffer":379,"../utils":380,"assert-plus":381,"safer-buffer":355}],364:[function(require,module,exports){
+},{"../dhe":360,"../key":378,"../private-key":379,"../ssh-buffer":381,"../utils":382,"assert-plus":383,"safer-buffer":357}],366:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = {
@@ -71289,7 +71540,7 @@ function getCertType(key) {
 	throw (new Error('Unsupported key type ' + key.type));
 }
 
-},{"../algs":356,"../certificate":357,"../identity":374,"../key":376,"../private-key":377,"../signature":378,"../ssh-buffer":379,"../utils":380,"./rfc4253":369,"assert-plus":381,"crypto":82,"safer-buffer":355}],365:[function(require,module,exports){
+},{"../algs":358,"../certificate":359,"../identity":376,"../key":378,"../private-key":379,"../signature":380,"../ssh-buffer":381,"../utils":382,"./rfc4253":371,"assert-plus":383,"crypto":82,"safer-buffer":357}],367:[function(require,module,exports){
 // Copyright 2018 Joyent, Inc.
 
 module.exports = {
@@ -71581,7 +71832,7 @@ function write(key, options, type) {
 	return (buf.slice(0, o));
 }
 
-},{"../algs":356,"../errors":360,"../key":376,"../private-key":377,"../utils":380,"./pkcs1":366,"./pkcs8":367,"./rfc4253":369,"./ssh-private":370,"asn1":305,"assert-plus":381,"crypto":82,"safer-buffer":355}],366:[function(require,module,exports){
+},{"../algs":358,"../errors":362,"../key":378,"../private-key":379,"../utils":382,"./pkcs1":368,"./pkcs8":369,"./rfc4253":371,"./ssh-private":372,"asn1":305,"assert-plus":383,"crypto":82,"safer-buffer":357}],368:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -71956,7 +72207,7 @@ function writePkcs1EdDSAPublic(der, key) {
 	throw (new Error('Public keys are not supported for EdDSA PKCS#1'));
 }
 
-},{"../algs":356,"../key":376,"../private-key":377,"../utils":380,"./pem":365,"./pkcs8":367,"asn1":305,"assert-plus":381,"safer-buffer":355}],367:[function(require,module,exports){
+},{"../algs":358,"../key":378,"../private-key":379,"../utils":382,"./pem":367,"./pkcs8":369,"asn1":305,"assert-plus":383,"safer-buffer":357}],369:[function(require,module,exports){
 // Copyright 2018 Joyent, Inc.
 
 module.exports = {
@@ -72589,7 +72840,7 @@ function writePkcs8EdDSAPrivate(key, der) {
 	der.endSequence();
 }
 
-},{"../algs":356,"../key":376,"../private-key":377,"../utils":380,"./pem":365,"asn1":305,"assert-plus":381,"safer-buffer":355}],368:[function(require,module,exports){
+},{"../algs":358,"../key":378,"../private-key":379,"../utils":382,"./pem":367,"asn1":305,"assert-plus":383,"safer-buffer":357}],370:[function(require,module,exports){
 // Copyright 2018 Joyent, Inc.
 
 module.exports = {
@@ -72690,7 +72941,7 @@ function wrap(txt, len) {
 	return (lines);
 }
 
-},{"../errors":360,"../key":376,"./rfc4253":369,"assert-plus":381,"safer-buffer":355}],369:[function(require,module,exports){
+},{"../errors":362,"../key":378,"./rfc4253":371,"assert-plus":383,"safer-buffer":357}],371:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -72858,7 +73109,7 @@ function write(key, options) {
 	return (buf.toBuffer());
 }
 
-},{"../algs":356,"../key":376,"../private-key":377,"../ssh-buffer":379,"../utils":380,"assert-plus":381,"safer-buffer":355}],370:[function(require,module,exports){
+},{"../algs":358,"../key":378,"../private-key":379,"../ssh-buffer":381,"../utils":382,"assert-plus":383,"safer-buffer":357}],372:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -73122,7 +73373,7 @@ function write(key, options) {
 	return (buf.slice(0, o));
 }
 
-},{"../algs":356,"../errors":360,"../key":376,"../private-key":377,"../ssh-buffer":379,"../utils":380,"./pem":365,"./rfc4253":369,"asn1":305,"assert-plus":381,"bcrypt-pbkdf":309,"crypto":82,"safer-buffer":355}],371:[function(require,module,exports){
+},{"../algs":358,"../errors":362,"../key":378,"../private-key":379,"../ssh-buffer":381,"../utils":382,"./pem":367,"./rfc4253":371,"asn1":305,"assert-plus":383,"bcrypt-pbkdf":309,"crypto":82,"safer-buffer":357}],373:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -73239,7 +73490,7 @@ function write(key, options) {
 	return (Buffer.from(parts.join(' ')));
 }
 
-},{"../key":376,"../private-key":377,"../utils":380,"./rfc4253":369,"./ssh-private":370,"assert-plus":381,"safer-buffer":355}],372:[function(require,module,exports){
+},{"../key":378,"../private-key":379,"../utils":382,"./rfc4253":371,"./ssh-private":372,"assert-plus":383,"safer-buffer":357}],374:[function(require,module,exports){
 // Copyright 2016 Joyent, Inc.
 
 var x509 = require('./x509');
@@ -73329,7 +73580,7 @@ function write(cert, options) {
 	return (buf.slice(0, o));
 }
 
-},{"../algs":356,"../certificate":357,"../identity":374,"../key":376,"../private-key":377,"../signature":378,"../utils":380,"./pem":365,"./x509":373,"asn1":305,"assert-plus":381,"safer-buffer":355}],373:[function(require,module,exports){
+},{"../algs":358,"../certificate":359,"../identity":376,"../key":378,"../private-key":379,"../signature":380,"../utils":382,"./pem":367,"./x509":375,"asn1":305,"assert-plus":383,"safer-buffer":357}],375:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = {
@@ -74083,7 +74334,7 @@ function writeBitField(setBits, bitIndex) {
 	return (bits);
 }
 
-},{"../algs":356,"../certificate":357,"../identity":374,"../key":376,"../private-key":377,"../signature":378,"../utils":380,"./pem":365,"./pkcs8":367,"asn1":305,"assert-plus":381,"safer-buffer":355}],374:[function(require,module,exports){
+},{"../algs":358,"../certificate":359,"../identity":376,"../key":378,"../private-key":379,"../signature":380,"../utils":382,"./pem":367,"./pkcs8":369,"asn1":305,"assert-plus":383,"safer-buffer":357}],376:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = Identity;
@@ -74458,7 +74709,7 @@ Identity._oldVersionDetect = function (obj) {
 	return ([1, 0]);
 };
 
-},{"./algs":356,"./errors":360,"./fingerprint":361,"./signature":378,"./utils":380,"asn1":305,"assert-plus":381,"crypto":82,"safer-buffer":355,"util":253}],375:[function(require,module,exports){
+},{"./algs":358,"./errors":362,"./fingerprint":363,"./signature":380,"./utils":382,"asn1":305,"assert-plus":383,"crypto":82,"safer-buffer":357,"util":253}],377:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 var Key = require('./key');
@@ -74500,7 +74751,7 @@ module.exports = {
 	CertificateParseError: errs.CertificateParseError
 };
 
-},{"./certificate":357,"./errors":360,"./fingerprint":361,"./identity":374,"./key":376,"./private-key":377,"./signature":378}],376:[function(require,module,exports){
+},{"./certificate":359,"./errors":362,"./fingerprint":363,"./identity":376,"./key":378,"./private-key":379,"./signature":380}],378:[function(require,module,exports){
 (function (Buffer){(function (){
 // Copyright 2018 Joyent, Inc.
 
@@ -74798,7 +75049,7 @@ Key._oldVersionDetect = function (obj) {
 };
 
 }).call(this)}).call(this,{"isBuffer":require("C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"./algs":356,"./dhe":358,"./ed-compat":359,"./errors":360,"./fingerprint":361,"./formats/auto":362,"./formats/dnssec":363,"./formats/pem":365,"./formats/pkcs1":366,"./formats/pkcs8":367,"./formats/putty":368,"./formats/rfc4253":369,"./formats/ssh":371,"./formats/ssh-private":370,"./private-key":377,"./signature":378,"./utils":380,"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"assert-plus":381,"crypto":82}],377:[function(require,module,exports){
+},{"./algs":358,"./dhe":360,"./ed-compat":361,"./errors":362,"./fingerprint":363,"./formats/auto":364,"./formats/dnssec":365,"./formats/pem":367,"./formats/pkcs1":368,"./formats/pkcs8":369,"./formats/putty":370,"./formats/rfc4253":371,"./formats/ssh":373,"./formats/ssh-private":372,"./private-key":379,"./signature":380,"./utils":382,"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"assert-plus":383,"crypto":82}],379:[function(require,module,exports){
 // Copyright 2017 Joyent, Inc.
 
 module.exports = PrivateKey;
@@ -75046,7 +75297,7 @@ PrivateKey._oldVersionDetect = function (obj) {
 	return ([1, 0]);
 };
 
-},{"./algs":356,"./dhe":358,"./ed-compat":359,"./errors":360,"./fingerprint":361,"./formats/auto":362,"./formats/dnssec":363,"./formats/pem":365,"./formats/pkcs1":366,"./formats/pkcs8":367,"./formats/rfc4253":369,"./formats/ssh-private":370,"./key":376,"./signature":378,"./utils":380,"assert-plus":381,"crypto":82,"safer-buffer":355,"tweetnacl":382,"util":253}],378:[function(require,module,exports){
+},{"./algs":358,"./dhe":360,"./ed-compat":361,"./errors":362,"./fingerprint":363,"./formats/auto":364,"./formats/dnssec":365,"./formats/pem":367,"./formats/pkcs1":368,"./formats/pkcs8":369,"./formats/rfc4253":371,"./formats/ssh-private":372,"./key":378,"./signature":380,"./utils":382,"assert-plus":383,"crypto":82,"safer-buffer":357,"tweetnacl":384,"util":253}],380:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = Signature;
@@ -75362,7 +75613,7 @@ Signature._oldVersionDetect = function (obj) {
 	return ([1, 0]);
 };
 
-},{"./algs":356,"./errors":360,"./ssh-buffer":379,"./utils":380,"asn1":305,"assert-plus":381,"crypto":82,"safer-buffer":355}],379:[function(require,module,exports){
+},{"./algs":358,"./errors":362,"./ssh-buffer":381,"./utils":382,"asn1":305,"assert-plus":383,"crypto":82,"safer-buffer":357}],381:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = SSHBuffer;
@@ -75513,7 +75764,7 @@ SSHBuffer.prototype.write = function (buf) {
 	this._offset += buf.length;
 };
 
-},{"assert-plus":381,"safer-buffer":355}],380:[function(require,module,exports){
+},{"assert-plus":383,"safer-buffer":357}],382:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 module.exports = {
@@ -75919,9 +76170,9 @@ function opensshCipherInfo(cipher) {
 	return (inf);
 }
 
-},{"./algs":356,"./key":376,"./private-key":377,"asn1":305,"assert-plus":381,"crypto":82,"ecc-jsbn/lib/ec":313,"jsbn":342,"safer-buffer":355,"tweetnacl":382}],381:[function(require,module,exports){
-arguments[4][347][0].apply(exports,arguments)
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":347,"stream":212,"util":253}],382:[function(require,module,exports){
+},{"./algs":358,"./key":378,"./private-key":379,"asn1":305,"assert-plus":383,"crypto":82,"ecc-jsbn/lib/ec":314,"jsbn":343,"safer-buffer":357,"tweetnacl":384}],383:[function(require,module,exports){
+arguments[4][348][0].apply(exports,arguments)
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":348,"stream":212,"util":253}],384:[function(require,module,exports){
 (function(nacl) {
 'use strict';
 
@@ -78311,7 +78562,7 @@ nacl.setPRNG = function(fn) {
 
 })(typeof module !== 'undefined' && module.exports ? module.exports : (self.nacl = self.nacl || {}));
 
-},{"crypto":25}],383:[function(require,module,exports){
+},{"crypto":25}],385:[function(require,module,exports){
 (function (Buffer){(function (){
 /**
  * Unirest for Node.js
@@ -79493,9 +79744,9 @@ function does (value) {
 module.exports = exports = Unirest
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":71,"form-data":320,"fs":1,"mime":400,"path":180,"querystring":198,"request":409,"stream":212,"string_decoder":246,"url":248,"zlib":69}],384:[function(require,module,exports){
-arguments[4][347][0].apply(exports,arguments)
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":347,"stream":212,"util":253}],385:[function(require,module,exports){
+},{"buffer":71,"form-data":321,"fs":1,"mime":402,"path":180,"querystring":198,"request":411,"stream":212,"string_decoder":246,"url":248,"zlib":69}],386:[function(require,module,exports){
+arguments[4][348][0].apply(exports,arguments)
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":348,"stream":212,"util":253}],387:[function(require,module,exports){
 
 /*!
  *  Copyright 2010 LearnBoost <dev@learnboost.com>
@@ -79709,7 +79960,7 @@ function canonicalizeResource (resource) {
 }
 module.exports.canonicalizeResource = canonicalizeResource
 
-},{"crypto":82,"url":248}],386:[function(require,module,exports){
+},{"crypto":82,"url":248}],388:[function(require,module,exports){
 function Caseless (dict) {
   this.dict = dict || {}
 }
@@ -79778,7 +80029,7 @@ module.exports.httpify = function (resp, headers) {
   return c
 }
 
-},{}],387:[function(require,module,exports){
+},{}],389:[function(require,module,exports){
 (function (Buffer){(function (){
 var util = require('util');
 var Stream = require('stream').Stream;
@@ -79990,7 +80241,7 @@ CombinedStream.prototype._emitError = function(err) {
 };
 
 }).call(this)}).call(this,{"isBuffer":require("C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"delayed-stream":388,"stream":212,"util":253}],388:[function(require,module,exports){
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"delayed-stream":390,"stream":212,"util":253}],390:[function(require,module,exports){
 var Stream = require('stream').Stream;
 var util = require('util');
 
@@ -80099,7 +80350,7 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
   this.emit('error', new Error(message));
 };
 
-},{"stream":212,"util":253}],389:[function(require,module,exports){
+},{"stream":212,"util":253}],391:[function(require,module,exports){
 function HARError (errors) {
   var message = 'validation failed'
 
@@ -80118,7 +80369,7 @@ HARError.prototype = Error.prototype
 
 module.exports = HARError
 
-},{}],390:[function(require,module,exports){
+},{}],392:[function(require,module,exports){
 var Ajv = require('ajv')
 var HARError = require('./error')
 var schemas = require('har-schema')
@@ -80222,7 +80473,7 @@ exports.timings = function (data) {
   return validate('timings', data)
 }
 
-},{"./error":389,"ajv":257,"ajv/lib/refs/json-schema-draft-06.json":298,"har-schema":331}],391:[function(require,module,exports){
+},{"./error":391,"ajv":257,"ajv/lib/refs/json-schema-draft-06.json":298,"har-schema":332}],393:[function(require,module,exports){
 // Copyright 2015 Joyent, Inc.
 
 var parser = require('./parser');
@@ -80253,7 +80504,7 @@ module.exports = {
   verifyHMAC: verify.verifyHMAC
 };
 
-},{"./parser":392,"./signer":393,"./utils":394,"./verify":395}],392:[function(require,module,exports){
+},{"./parser":394,"./signer":395,"./utils":396,"./verify":397}],394:[function(require,module,exports){
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var assert = require('assert-plus');
@@ -80570,7 +80821,7 @@ module.exports = {
 
 };
 
-},{"./utils":394,"assert-plus":384,"util":253}],393:[function(require,module,exports){
+},{"./utils":396,"assert-plus":386,"util":253}],395:[function(require,module,exports){
 (function (Buffer){(function (){
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
@@ -80975,7 +81226,7 @@ module.exports = {
 };
 
 }).call(this)}).call(this,{"isBuffer":require("C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"./utils":394,"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"assert-plus":384,"crypto":82,"http":227,"jsprim":346,"sshpk":375,"util":253}],394:[function(require,module,exports){
+},{"./utils":396,"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"assert-plus":386,"crypto":82,"http":227,"jsprim":347,"sshpk":377,"util":253}],396:[function(require,module,exports){
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
 var assert = require('assert-plus');
@@ -81089,7 +81340,7 @@ module.exports = {
   }
 };
 
-},{"assert-plus":384,"sshpk":375,"util":253}],395:[function(require,module,exports){
+},{"assert-plus":386,"sshpk":377,"util":253}],397:[function(require,module,exports){
 (function (Buffer){(function (){
 // Copyright 2015 Joyent, Inc.
 
@@ -81181,7 +81432,7 @@ module.exports = {
 };
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./utils":394,"assert-plus":384,"buffer":71,"crypto":82,"sshpk":375}],396:[function(require,module,exports){
+},{"./utils":396,"assert-plus":386,"buffer":71,"crypto":82,"sshpk":377}],398:[function(require,module,exports){
 module.exports={
   "application/1d-interleaved-parityfec": {
     "source": "iana"
@@ -89600,9 +89851,9 @@ module.exports={
   }
 }
 
-},{}],397:[function(require,module,exports){
-arguments[4][349][0].apply(exports,arguments)
-},{"./db.json":396,"dup":349}],398:[function(require,module,exports){
+},{}],399:[function(require,module,exports){
+arguments[4][350][0].apply(exports,arguments)
+},{"./db.json":398,"dup":350}],400:[function(require,module,exports){
 /*!
  * mime-types
  * Copyright(c) 2014 Jonathan Ong
@@ -89792,7 +90043,7 @@ function populateMaps (extensions, types) {
   })
 }
 
-},{"mime-db":397,"path":180}],399:[function(require,module,exports){
+},{"mime-db":399,"path":180}],401:[function(require,module,exports){
 'use strict';
 
 /**
@@ -89891,17 +90142,17 @@ Mime.prototype.getExtension = function(type) {
 
 module.exports = Mime;
 
-},{}],400:[function(require,module,exports){
+},{}],402:[function(require,module,exports){
 'use strict';
 
 let Mime = require('./Mime');
 module.exports = new Mime(require('./types/standard'), require('./types/other'));
 
-},{"./Mime":399,"./types/other":401,"./types/standard":402}],401:[function(require,module,exports){
+},{"./Mime":401,"./types/other":403,"./types/standard":404}],403:[function(require,module,exports){
 module.exports = {"application/prs.cww":["cww"],"application/vnd.1000minds.decision-model+xml":["1km"],"application/vnd.3gpp.pic-bw-large":["plb"],"application/vnd.3gpp.pic-bw-small":["psb"],"application/vnd.3gpp.pic-bw-var":["pvb"],"application/vnd.3gpp2.tcap":["tcap"],"application/vnd.3m.post-it-notes":["pwn"],"application/vnd.accpac.simply.aso":["aso"],"application/vnd.accpac.simply.imp":["imp"],"application/vnd.acucobol":["acu"],"application/vnd.acucorp":["atc","acutc"],"application/vnd.adobe.air-application-installer-package+zip":["air"],"application/vnd.adobe.formscentral.fcdt":["fcdt"],"application/vnd.adobe.fxp":["fxp","fxpl"],"application/vnd.adobe.xdp+xml":["xdp"],"application/vnd.adobe.xfdf":["xfdf"],"application/vnd.ahead.space":["ahead"],"application/vnd.airzip.filesecure.azf":["azf"],"application/vnd.airzip.filesecure.azs":["azs"],"application/vnd.amazon.ebook":["azw"],"application/vnd.americandynamics.acc":["acc"],"application/vnd.amiga.ami":["ami"],"application/vnd.android.package-archive":["apk"],"application/vnd.anser-web-certificate-issue-initiation":["cii"],"application/vnd.anser-web-funds-transfer-initiation":["fti"],"application/vnd.antix.game-component":["atx"],"application/vnd.apple.installer+xml":["mpkg"],"application/vnd.apple.keynote":["key"],"application/vnd.apple.mpegurl":["m3u8"],"application/vnd.apple.numbers":["numbers"],"application/vnd.apple.pages":["pages"],"application/vnd.apple.pkpass":["pkpass"],"application/vnd.aristanetworks.swi":["swi"],"application/vnd.astraea-software.iota":["iota"],"application/vnd.audiograph":["aep"],"application/vnd.balsamiq.bmml+xml":["bmml"],"application/vnd.blueice.multipass":["mpm"],"application/vnd.bmi":["bmi"],"application/vnd.businessobjects":["rep"],"application/vnd.chemdraw+xml":["cdxml"],"application/vnd.chipnuts.karaoke-mmd":["mmd"],"application/vnd.cinderella":["cdy"],"application/vnd.citationstyles.style+xml":["csl"],"application/vnd.claymore":["cla"],"application/vnd.cloanto.rp9":["rp9"],"application/vnd.clonk.c4group":["c4g","c4d","c4f","c4p","c4u"],"application/vnd.cluetrust.cartomobile-config":["c11amc"],"application/vnd.cluetrust.cartomobile-config-pkg":["c11amz"],"application/vnd.commonspace":["csp"],"application/vnd.contact.cmsg":["cdbcmsg"],"application/vnd.cosmocaller":["cmc"],"application/vnd.crick.clicker":["clkx"],"application/vnd.crick.clicker.keyboard":["clkk"],"application/vnd.crick.clicker.palette":["clkp"],"application/vnd.crick.clicker.template":["clkt"],"application/vnd.crick.clicker.wordbank":["clkw"],"application/vnd.criticaltools.wbs+xml":["wbs"],"application/vnd.ctc-posml":["pml"],"application/vnd.cups-ppd":["ppd"],"application/vnd.curl.car":["car"],"application/vnd.curl.pcurl":["pcurl"],"application/vnd.dart":["dart"],"application/vnd.data-vision.rdz":["rdz"],"application/vnd.dbf":["dbf"],"application/vnd.dece.data":["uvf","uvvf","uvd","uvvd"],"application/vnd.dece.ttml+xml":["uvt","uvvt"],"application/vnd.dece.unspecified":["uvx","uvvx"],"application/vnd.dece.zip":["uvz","uvvz"],"application/vnd.denovo.fcselayout-link":["fe_launch"],"application/vnd.dna":["dna"],"application/vnd.dolby.mlp":["mlp"],"application/vnd.dpgraph":["dpg"],"application/vnd.dreamfactory":["dfac"],"application/vnd.ds-keypoint":["kpxx"],"application/vnd.dvb.ait":["ait"],"application/vnd.dvb.service":["svc"],"application/vnd.dynageo":["geo"],"application/vnd.ecowin.chart":["mag"],"application/vnd.enliven":["nml"],"application/vnd.epson.esf":["esf"],"application/vnd.epson.msf":["msf"],"application/vnd.epson.quickanime":["qam"],"application/vnd.epson.salt":["slt"],"application/vnd.epson.ssf":["ssf"],"application/vnd.eszigno3+xml":["es3","et3"],"application/vnd.ezpix-album":["ez2"],"application/vnd.ezpix-package":["ez3"],"application/vnd.fdf":["fdf"],"application/vnd.fdsn.mseed":["mseed"],"application/vnd.fdsn.seed":["seed","dataless"],"application/vnd.flographit":["gph"],"application/vnd.fluxtime.clip":["ftc"],"application/vnd.framemaker":["fm","frame","maker","book"],"application/vnd.frogans.fnc":["fnc"],"application/vnd.frogans.ltf":["ltf"],"application/vnd.fsc.weblaunch":["fsc"],"application/vnd.fujitsu.oasys":["oas"],"application/vnd.fujitsu.oasys2":["oa2"],"application/vnd.fujitsu.oasys3":["oa3"],"application/vnd.fujitsu.oasysgp":["fg5"],"application/vnd.fujitsu.oasysprs":["bh2"],"application/vnd.fujixerox.ddd":["ddd"],"application/vnd.fujixerox.docuworks":["xdw"],"application/vnd.fujixerox.docuworks.binder":["xbd"],"application/vnd.fuzzysheet":["fzs"],"application/vnd.genomatix.tuxedo":["txd"],"application/vnd.geogebra.file":["ggb"],"application/vnd.geogebra.tool":["ggt"],"application/vnd.geometry-explorer":["gex","gre"],"application/vnd.geonext":["gxt"],"application/vnd.geoplan":["g2w"],"application/vnd.geospace":["g3w"],"application/vnd.gmx":["gmx"],"application/vnd.google-apps.document":["gdoc"],"application/vnd.google-apps.presentation":["gslides"],"application/vnd.google-apps.spreadsheet":["gsheet"],"application/vnd.google-earth.kml+xml":["kml"],"application/vnd.google-earth.kmz":["kmz"],"application/vnd.grafeq":["gqf","gqs"],"application/vnd.groove-account":["gac"],"application/vnd.groove-help":["ghf"],"application/vnd.groove-identity-message":["gim"],"application/vnd.groove-injector":["grv"],"application/vnd.groove-tool-message":["gtm"],"application/vnd.groove-tool-template":["tpl"],"application/vnd.groove-vcard":["vcg"],"application/vnd.hal+xml":["hal"],"application/vnd.handheld-entertainment+xml":["zmm"],"application/vnd.hbci":["hbci"],"application/vnd.hhe.lesson-player":["les"],"application/vnd.hp-hpgl":["hpgl"],"application/vnd.hp-hpid":["hpid"],"application/vnd.hp-hps":["hps"],"application/vnd.hp-jlyt":["jlt"],"application/vnd.hp-pcl":["pcl"],"application/vnd.hp-pclxl":["pclxl"],"application/vnd.hydrostatix.sof-data":["sfd-hdstx"],"application/vnd.ibm.minipay":["mpy"],"application/vnd.ibm.modcap":["afp","listafp","list3820"],"application/vnd.ibm.rights-management":["irm"],"application/vnd.ibm.secure-container":["sc"],"application/vnd.iccprofile":["icc","icm"],"application/vnd.igloader":["igl"],"application/vnd.immervision-ivp":["ivp"],"application/vnd.immervision-ivu":["ivu"],"application/vnd.insors.igm":["igm"],"application/vnd.intercon.formnet":["xpw","xpx"],"application/vnd.intergeo":["i2g"],"application/vnd.intu.qbo":["qbo"],"application/vnd.intu.qfx":["qfx"],"application/vnd.ipunplugged.rcprofile":["rcprofile"],"application/vnd.irepository.package+xml":["irp"],"application/vnd.is-xpr":["xpr"],"application/vnd.isac.fcs":["fcs"],"application/vnd.jam":["jam"],"application/vnd.jcp.javame.midlet-rms":["rms"],"application/vnd.jisp":["jisp"],"application/vnd.joost.joda-archive":["joda"],"application/vnd.kahootz":["ktz","ktr"],"application/vnd.kde.karbon":["karbon"],"application/vnd.kde.kchart":["chrt"],"application/vnd.kde.kformula":["kfo"],"application/vnd.kde.kivio":["flw"],"application/vnd.kde.kontour":["kon"],"application/vnd.kde.kpresenter":["kpr","kpt"],"application/vnd.kde.kspread":["ksp"],"application/vnd.kde.kword":["kwd","kwt"],"application/vnd.kenameaapp":["htke"],"application/vnd.kidspiration":["kia"],"application/vnd.kinar":["kne","knp"],"application/vnd.koan":["skp","skd","skt","skm"],"application/vnd.kodak-descriptor":["sse"],"application/vnd.las.las+xml":["lasxml"],"application/vnd.llamagraphics.life-balance.desktop":["lbd"],"application/vnd.llamagraphics.life-balance.exchange+xml":["lbe"],"application/vnd.lotus-1-2-3":["123"],"application/vnd.lotus-approach":["apr"],"application/vnd.lotus-freelance":["pre"],"application/vnd.lotus-notes":["nsf"],"application/vnd.lotus-organizer":["org"],"application/vnd.lotus-screencam":["scm"],"application/vnd.lotus-wordpro":["lwp"],"application/vnd.macports.portpkg":["portpkg"],"application/vnd.mcd":["mcd"],"application/vnd.medcalcdata":["mc1"],"application/vnd.mediastation.cdkey":["cdkey"],"application/vnd.mfer":["mwf"],"application/vnd.mfmp":["mfm"],"application/vnd.micrografx.flo":["flo"],"application/vnd.micrografx.igx":["igx"],"application/vnd.mif":["mif"],"application/vnd.mobius.daf":["daf"],"application/vnd.mobius.dis":["dis"],"application/vnd.mobius.mbk":["mbk"],"application/vnd.mobius.mqy":["mqy"],"application/vnd.mobius.msl":["msl"],"application/vnd.mobius.plc":["plc"],"application/vnd.mobius.txf":["txf"],"application/vnd.mophun.application":["mpn"],"application/vnd.mophun.certificate":["mpc"],"application/vnd.mozilla.xul+xml":["xul"],"application/vnd.ms-artgalry":["cil"],"application/vnd.ms-cab-compressed":["cab"],"application/vnd.ms-excel":["xls","xlm","xla","xlc","xlt","xlw"],"application/vnd.ms-excel.addin.macroenabled.12":["xlam"],"application/vnd.ms-excel.sheet.binary.macroenabled.12":["xlsb"],"application/vnd.ms-excel.sheet.macroenabled.12":["xlsm"],"application/vnd.ms-excel.template.macroenabled.12":["xltm"],"application/vnd.ms-fontobject":["eot"],"application/vnd.ms-htmlhelp":["chm"],"application/vnd.ms-ims":["ims"],"application/vnd.ms-lrm":["lrm"],"application/vnd.ms-officetheme":["thmx"],"application/vnd.ms-outlook":["msg"],"application/vnd.ms-pki.seccat":["cat"],"application/vnd.ms-pki.stl":["*stl"],"application/vnd.ms-powerpoint":["ppt","pps","pot"],"application/vnd.ms-powerpoint.addin.macroenabled.12":["ppam"],"application/vnd.ms-powerpoint.presentation.macroenabled.12":["pptm"],"application/vnd.ms-powerpoint.slide.macroenabled.12":["sldm"],"application/vnd.ms-powerpoint.slideshow.macroenabled.12":["ppsm"],"application/vnd.ms-powerpoint.template.macroenabled.12":["potm"],"application/vnd.ms-project":["mpp","mpt"],"application/vnd.ms-word.document.macroenabled.12":["docm"],"application/vnd.ms-word.template.macroenabled.12":["dotm"],"application/vnd.ms-works":["wps","wks","wcm","wdb"],"application/vnd.ms-wpl":["wpl"],"application/vnd.ms-xpsdocument":["xps"],"application/vnd.mseq":["mseq"],"application/vnd.musician":["mus"],"application/vnd.muvee.style":["msty"],"application/vnd.mynfc":["taglet"],"application/vnd.neurolanguage.nlu":["nlu"],"application/vnd.nitf":["ntf","nitf"],"application/vnd.noblenet-directory":["nnd"],"application/vnd.noblenet-sealer":["nns"],"application/vnd.noblenet-web":["nnw"],"application/vnd.nokia.n-gage.ac+xml":["*ac"],"application/vnd.nokia.n-gage.data":["ngdat"],"application/vnd.nokia.n-gage.symbian.install":["n-gage"],"application/vnd.nokia.radio-preset":["rpst"],"application/vnd.nokia.radio-presets":["rpss"],"application/vnd.novadigm.edm":["edm"],"application/vnd.novadigm.edx":["edx"],"application/vnd.novadigm.ext":["ext"],"application/vnd.oasis.opendocument.chart":["odc"],"application/vnd.oasis.opendocument.chart-template":["otc"],"application/vnd.oasis.opendocument.database":["odb"],"application/vnd.oasis.opendocument.formula":["odf"],"application/vnd.oasis.opendocument.formula-template":["odft"],"application/vnd.oasis.opendocument.graphics":["odg"],"application/vnd.oasis.opendocument.graphics-template":["otg"],"application/vnd.oasis.opendocument.image":["odi"],"application/vnd.oasis.opendocument.image-template":["oti"],"application/vnd.oasis.opendocument.presentation":["odp"],"application/vnd.oasis.opendocument.presentation-template":["otp"],"application/vnd.oasis.opendocument.spreadsheet":["ods"],"application/vnd.oasis.opendocument.spreadsheet-template":["ots"],"application/vnd.oasis.opendocument.text":["odt"],"application/vnd.oasis.opendocument.text-master":["odm"],"application/vnd.oasis.opendocument.text-template":["ott"],"application/vnd.oasis.opendocument.text-web":["oth"],"application/vnd.olpc-sugar":["xo"],"application/vnd.oma.dd2+xml":["dd2"],"application/vnd.openblox.game+xml":["obgx"],"application/vnd.openofficeorg.extension":["oxt"],"application/vnd.openstreetmap.data+xml":["osm"],"application/vnd.openxmlformats-officedocument.presentationml.presentation":["pptx"],"application/vnd.openxmlformats-officedocument.presentationml.slide":["sldx"],"application/vnd.openxmlformats-officedocument.presentationml.slideshow":["ppsx"],"application/vnd.openxmlformats-officedocument.presentationml.template":["potx"],"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":["xlsx"],"application/vnd.openxmlformats-officedocument.spreadsheetml.template":["xltx"],"application/vnd.openxmlformats-officedocument.wordprocessingml.document":["docx"],"application/vnd.openxmlformats-officedocument.wordprocessingml.template":["dotx"],"application/vnd.osgeo.mapguide.package":["mgp"],"application/vnd.osgi.dp":["dp"],"application/vnd.osgi.subsystem":["esa"],"application/vnd.palm":["pdb","pqa","oprc"],"application/vnd.pawaafile":["paw"],"application/vnd.pg.format":["str"],"application/vnd.pg.osasli":["ei6"],"application/vnd.picsel":["efif"],"application/vnd.pmi.widget":["wg"],"application/vnd.pocketlearn":["plf"],"application/vnd.powerbuilder6":["pbd"],"application/vnd.previewsystems.box":["box"],"application/vnd.proteus.magazine":["mgz"],"application/vnd.publishare-delta-tree":["qps"],"application/vnd.pvi.ptid1":["ptid"],"application/vnd.quark.quarkxpress":["qxd","qxt","qwd","qwt","qxl","qxb"],"application/vnd.rar":["rar"],"application/vnd.realvnc.bed":["bed"],"application/vnd.recordare.musicxml":["mxl"],"application/vnd.recordare.musicxml+xml":["musicxml"],"application/vnd.rig.cryptonote":["cryptonote"],"application/vnd.rim.cod":["cod"],"application/vnd.rn-realmedia":["rm"],"application/vnd.rn-realmedia-vbr":["rmvb"],"application/vnd.route66.link66+xml":["link66"],"application/vnd.sailingtracker.track":["st"],"application/vnd.seemail":["see"],"application/vnd.sema":["sema"],"application/vnd.semd":["semd"],"application/vnd.semf":["semf"],"application/vnd.shana.informed.formdata":["ifm"],"application/vnd.shana.informed.formtemplate":["itp"],"application/vnd.shana.informed.interchange":["iif"],"application/vnd.shana.informed.package":["ipk"],"application/vnd.simtech-mindmapper":["twd","twds"],"application/vnd.smaf":["mmf"],"application/vnd.smart.teacher":["teacher"],"application/vnd.software602.filler.form+xml":["fo"],"application/vnd.solent.sdkm+xml":["sdkm","sdkd"],"application/vnd.spotfire.dxp":["dxp"],"application/vnd.spotfire.sfs":["sfs"],"application/vnd.stardivision.calc":["sdc"],"application/vnd.stardivision.draw":["sda"],"application/vnd.stardivision.impress":["sdd"],"application/vnd.stardivision.math":["smf"],"application/vnd.stardivision.writer":["sdw","vor"],"application/vnd.stardivision.writer-global":["sgl"],"application/vnd.stepmania.package":["smzip"],"application/vnd.stepmania.stepchart":["sm"],"application/vnd.sun.wadl+xml":["wadl"],"application/vnd.sun.xml.calc":["sxc"],"application/vnd.sun.xml.calc.template":["stc"],"application/vnd.sun.xml.draw":["sxd"],"application/vnd.sun.xml.draw.template":["std"],"application/vnd.sun.xml.impress":["sxi"],"application/vnd.sun.xml.impress.template":["sti"],"application/vnd.sun.xml.math":["sxm"],"application/vnd.sun.xml.writer":["sxw"],"application/vnd.sun.xml.writer.global":["sxg"],"application/vnd.sun.xml.writer.template":["stw"],"application/vnd.sus-calendar":["sus","susp"],"application/vnd.svd":["svd"],"application/vnd.symbian.install":["sis","sisx"],"application/vnd.syncml+xml":["xsm"],"application/vnd.syncml.dm+wbxml":["bdm"],"application/vnd.syncml.dm+xml":["xdm"],"application/vnd.syncml.dmddf+xml":["ddf"],"application/vnd.tao.intent-module-archive":["tao"],"application/vnd.tcpdump.pcap":["pcap","cap","dmp"],"application/vnd.tmobile-livetv":["tmo"],"application/vnd.trid.tpt":["tpt"],"application/vnd.triscape.mxs":["mxs"],"application/vnd.trueapp":["tra"],"application/vnd.ufdl":["ufd","ufdl"],"application/vnd.uiq.theme":["utz"],"application/vnd.umajin":["umj"],"application/vnd.unity":["unityweb"],"application/vnd.uoml+xml":["uoml"],"application/vnd.vcx":["vcx"],"application/vnd.visio":["vsd","vst","vss","vsw"],"application/vnd.visionary":["vis"],"application/vnd.vsf":["vsf"],"application/vnd.wap.wbxml":["wbxml"],"application/vnd.wap.wmlc":["wmlc"],"application/vnd.wap.wmlscriptc":["wmlsc"],"application/vnd.webturbo":["wtb"],"application/vnd.wolfram.player":["nbp"],"application/vnd.wordperfect":["wpd"],"application/vnd.wqd":["wqd"],"application/vnd.wt.stf":["stf"],"application/vnd.xara":["xar"],"application/vnd.xfdl":["xfdl"],"application/vnd.yamaha.hv-dic":["hvd"],"application/vnd.yamaha.hv-script":["hvs"],"application/vnd.yamaha.hv-voice":["hvp"],"application/vnd.yamaha.openscoreformat":["osf"],"application/vnd.yamaha.openscoreformat.osfpvg+xml":["osfpvg"],"application/vnd.yamaha.smaf-audio":["saf"],"application/vnd.yamaha.smaf-phrase":["spf"],"application/vnd.yellowriver-custom-menu":["cmp"],"application/vnd.zul":["zir","zirz"],"application/vnd.zzazz.deck+xml":["zaz"],"application/x-7z-compressed":["7z"],"application/x-abiword":["abw"],"application/x-ace-compressed":["ace"],"application/x-apple-diskimage":["*dmg"],"application/x-arj":["arj"],"application/x-authorware-bin":["aab","x32","u32","vox"],"application/x-authorware-map":["aam"],"application/x-authorware-seg":["aas"],"application/x-bcpio":["bcpio"],"application/x-bdoc":["*bdoc"],"application/x-bittorrent":["torrent"],"application/x-blorb":["blb","blorb"],"application/x-bzip":["bz"],"application/x-bzip2":["bz2","boz"],"application/x-cbr":["cbr","cba","cbt","cbz","cb7"],"application/x-cdlink":["vcd"],"application/x-cfs-compressed":["cfs"],"application/x-chat":["chat"],"application/x-chess-pgn":["pgn"],"application/x-chrome-extension":["crx"],"application/x-cocoa":["cco"],"application/x-conference":["nsc"],"application/x-cpio":["cpio"],"application/x-csh":["csh"],"application/x-debian-package":["*deb","udeb"],"application/x-dgc-compressed":["dgc"],"application/x-director":["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"],"application/x-doom":["wad"],"application/x-dtbncx+xml":["ncx"],"application/x-dtbook+xml":["dtb"],"application/x-dtbresource+xml":["res"],"application/x-dvi":["dvi"],"application/x-envoy":["evy"],"application/x-eva":["eva"],"application/x-font-bdf":["bdf"],"application/x-font-ghostscript":["gsf"],"application/x-font-linux-psf":["psf"],"application/x-font-pcf":["pcf"],"application/x-font-snf":["snf"],"application/x-font-type1":["pfa","pfb","pfm","afm"],"application/x-freearc":["arc"],"application/x-futuresplash":["spl"],"application/x-gca-compressed":["gca"],"application/x-glulx":["ulx"],"application/x-gnumeric":["gnumeric"],"application/x-gramps-xml":["gramps"],"application/x-gtar":["gtar"],"application/x-hdf":["hdf"],"application/x-httpd-php":["php"],"application/x-install-instructions":["install"],"application/x-iso9660-image":["*iso"],"application/x-java-archive-diff":["jardiff"],"application/x-java-jnlp-file":["jnlp"],"application/x-keepass2":["kdbx"],"application/x-latex":["latex"],"application/x-lua-bytecode":["luac"],"application/x-lzh-compressed":["lzh","lha"],"application/x-makeself":["run"],"application/x-mie":["mie"],"application/x-mobipocket-ebook":["prc","mobi"],"application/x-ms-application":["application"],"application/x-ms-shortcut":["lnk"],"application/x-ms-wmd":["wmd"],"application/x-ms-wmz":["wmz"],"application/x-ms-xbap":["xbap"],"application/x-msaccess":["mdb"],"application/x-msbinder":["obd"],"application/x-mscardfile":["crd"],"application/x-msclip":["clp"],"application/x-msdos-program":["*exe"],"application/x-msdownload":["*exe","*dll","com","bat","*msi"],"application/x-msmediaview":["mvb","m13","m14"],"application/x-msmetafile":["*wmf","*wmz","*emf","emz"],"application/x-msmoney":["mny"],"application/x-mspublisher":["pub"],"application/x-msschedule":["scd"],"application/x-msterminal":["trm"],"application/x-mswrite":["wri"],"application/x-netcdf":["nc","cdf"],"application/x-ns-proxy-autoconfig":["pac"],"application/x-nzb":["nzb"],"application/x-perl":["pl","pm"],"application/x-pilot":["*prc","*pdb"],"application/x-pkcs12":["p12","pfx"],"application/x-pkcs7-certificates":["p7b","spc"],"application/x-pkcs7-certreqresp":["p7r"],"application/x-rar-compressed":["*rar"],"application/x-redhat-package-manager":["rpm"],"application/x-research-info-systems":["ris"],"application/x-sea":["sea"],"application/x-sh":["sh"],"application/x-shar":["shar"],"application/x-shockwave-flash":["swf"],"application/x-silverlight-app":["xap"],"application/x-sql":["sql"],"application/x-stuffit":["sit"],"application/x-stuffitx":["sitx"],"application/x-subrip":["srt"],"application/x-sv4cpio":["sv4cpio"],"application/x-sv4crc":["sv4crc"],"application/x-t3vm-image":["t3"],"application/x-tads":["gam"],"application/x-tar":["tar"],"application/x-tcl":["tcl","tk"],"application/x-tex":["tex"],"application/x-tex-tfm":["tfm"],"application/x-texinfo":["texinfo","texi"],"application/x-tgif":["*obj"],"application/x-ustar":["ustar"],"application/x-virtualbox-hdd":["hdd"],"application/x-virtualbox-ova":["ova"],"application/x-virtualbox-ovf":["ovf"],"application/x-virtualbox-vbox":["vbox"],"application/x-virtualbox-vbox-extpack":["vbox-extpack"],"application/x-virtualbox-vdi":["vdi"],"application/x-virtualbox-vhd":["vhd"],"application/x-virtualbox-vmdk":["vmdk"],"application/x-wais-source":["src"],"application/x-web-app-manifest+json":["webapp"],"application/x-x509-ca-cert":["der","crt","pem"],"application/x-xfig":["fig"],"application/x-xliff+xml":["*xlf"],"application/x-xpinstall":["xpi"],"application/x-xz":["xz"],"application/x-zmachine":["z1","z2","z3","z4","z5","z6","z7","z8"],"audio/vnd.dece.audio":["uva","uvva"],"audio/vnd.digital-winds":["eol"],"audio/vnd.dra":["dra"],"audio/vnd.dts":["dts"],"audio/vnd.dts.hd":["dtshd"],"audio/vnd.lucent.voice":["lvp"],"audio/vnd.ms-playready.media.pya":["pya"],"audio/vnd.nuera.ecelp4800":["ecelp4800"],"audio/vnd.nuera.ecelp7470":["ecelp7470"],"audio/vnd.nuera.ecelp9600":["ecelp9600"],"audio/vnd.rip":["rip"],"audio/x-aac":["aac"],"audio/x-aiff":["aif","aiff","aifc"],"audio/x-caf":["caf"],"audio/x-flac":["flac"],"audio/x-m4a":["*m4a"],"audio/x-matroska":["mka"],"audio/x-mpegurl":["m3u"],"audio/x-ms-wax":["wax"],"audio/x-ms-wma":["wma"],"audio/x-pn-realaudio":["ram","ra"],"audio/x-pn-realaudio-plugin":["rmp"],"audio/x-realaudio":["*ra"],"audio/x-wav":["*wav"],"chemical/x-cdx":["cdx"],"chemical/x-cif":["cif"],"chemical/x-cmdf":["cmdf"],"chemical/x-cml":["cml"],"chemical/x-csml":["csml"],"chemical/x-xyz":["xyz"],"image/prs.btif":["btif"],"image/prs.pti":["pti"],"image/vnd.adobe.photoshop":["psd"],"image/vnd.airzip.accelerator.azv":["azv"],"image/vnd.dece.graphic":["uvi","uvvi","uvg","uvvg"],"image/vnd.djvu":["djvu","djv"],"image/vnd.dvb.subtitle":["*sub"],"image/vnd.dwg":["dwg"],"image/vnd.dxf":["dxf"],"image/vnd.fastbidsheet":["fbs"],"image/vnd.fpx":["fpx"],"image/vnd.fst":["fst"],"image/vnd.fujixerox.edmics-mmr":["mmr"],"image/vnd.fujixerox.edmics-rlc":["rlc"],"image/vnd.microsoft.icon":["ico"],"image/vnd.ms-dds":["dds"],"image/vnd.ms-modi":["mdi"],"image/vnd.ms-photo":["wdp"],"image/vnd.net-fpx":["npx"],"image/vnd.pco.b16":["b16"],"image/vnd.tencent.tap":["tap"],"image/vnd.valve.source.texture":["vtf"],"image/vnd.wap.wbmp":["wbmp"],"image/vnd.xiff":["xif"],"image/vnd.zbrush.pcx":["pcx"],"image/x-3ds":["3ds"],"image/x-cmu-raster":["ras"],"image/x-cmx":["cmx"],"image/x-freehand":["fh","fhc","fh4","fh5","fh7"],"image/x-icon":["*ico"],"image/x-jng":["jng"],"image/x-mrsid-image":["sid"],"image/x-ms-bmp":["*bmp"],"image/x-pcx":["*pcx"],"image/x-pict":["pic","pct"],"image/x-portable-anymap":["pnm"],"image/x-portable-bitmap":["pbm"],"image/x-portable-graymap":["pgm"],"image/x-portable-pixmap":["ppm"],"image/x-rgb":["rgb"],"image/x-tga":["tga"],"image/x-xbitmap":["xbm"],"image/x-xpixmap":["xpm"],"image/x-xwindowdump":["xwd"],"message/vnd.wfa.wsc":["wsc"],"model/vnd.collada+xml":["dae"],"model/vnd.dwf":["dwf"],"model/vnd.gdl":["gdl"],"model/vnd.gtw":["gtw"],"model/vnd.mts":["mts"],"model/vnd.opengex":["ogex"],"model/vnd.parasolid.transmit.binary":["x_b"],"model/vnd.parasolid.transmit.text":["x_t"],"model/vnd.usdz+zip":["usdz"],"model/vnd.valve.source.compiled-map":["bsp"],"model/vnd.vtu":["vtu"],"text/prs.lines.tag":["dsc"],"text/vnd.curl":["curl"],"text/vnd.curl.dcurl":["dcurl"],"text/vnd.curl.mcurl":["mcurl"],"text/vnd.curl.scurl":["scurl"],"text/vnd.dvb.subtitle":["sub"],"text/vnd.fly":["fly"],"text/vnd.fmi.flexstor":["flx"],"text/vnd.graphviz":["gv"],"text/vnd.in3d.3dml":["3dml"],"text/vnd.in3d.spot":["spot"],"text/vnd.sun.j2me.app-descriptor":["jad"],"text/vnd.wap.wml":["wml"],"text/vnd.wap.wmlscript":["wmls"],"text/x-asm":["s","asm"],"text/x-c":["c","cc","cxx","cpp","h","hh","dic"],"text/x-component":["htc"],"text/x-fortran":["f","for","f77","f90"],"text/x-handlebars-template":["hbs"],"text/x-java-source":["java"],"text/x-lua":["lua"],"text/x-markdown":["mkd"],"text/x-nfo":["nfo"],"text/x-opml":["opml"],"text/x-org":["*org"],"text/x-pascal":["p","pas"],"text/x-processing":["pde"],"text/x-sass":["sass"],"text/x-scss":["scss"],"text/x-setext":["etx"],"text/x-sfv":["sfv"],"text/x-suse-ymp":["ymp"],"text/x-uuencode":["uu"],"text/x-vcalendar":["vcs"],"text/x-vcard":["vcf"],"video/vnd.dece.hd":["uvh","uvvh"],"video/vnd.dece.mobile":["uvm","uvvm"],"video/vnd.dece.pd":["uvp","uvvp"],"video/vnd.dece.sd":["uvs","uvvs"],"video/vnd.dece.video":["uvv","uvvv"],"video/vnd.dvb.file":["dvb"],"video/vnd.fvt":["fvt"],"video/vnd.mpegurl":["mxu","m4u"],"video/vnd.ms-playready.media.pyv":["pyv"],"video/vnd.uvvu.mp4":["uvu","uvvu"],"video/vnd.vivo":["viv"],"video/x-f4v":["f4v"],"video/x-fli":["fli"],"video/x-flv":["flv"],"video/x-m4v":["m4v"],"video/x-matroska":["mkv","mk3d","mks"],"video/x-mng":["mng"],"video/x-ms-asf":["asf","asx"],"video/x-ms-vob":["vob"],"video/x-ms-wm":["wm"],"video/x-ms-wmv":["wmv"],"video/x-ms-wmx":["wmx"],"video/x-ms-wvx":["wvx"],"video/x-msvideo":["avi"],"video/x-sgi-movie":["movie"],"video/x-smv":["smv"],"x-conference/x-cooltalk":["ice"]};
-},{}],402:[function(require,module,exports){
+},{}],404:[function(require,module,exports){
 module.exports = {"application/andrew-inset":["ez"],"application/applixware":["aw"],"application/atom+xml":["atom"],"application/atomcat+xml":["atomcat"],"application/atomdeleted+xml":["atomdeleted"],"application/atomsvc+xml":["atomsvc"],"application/atsc-dwd+xml":["dwd"],"application/atsc-held+xml":["held"],"application/atsc-rsat+xml":["rsat"],"application/bdoc":["bdoc"],"application/calendar+xml":["xcs"],"application/ccxml+xml":["ccxml"],"application/cdfx+xml":["cdfx"],"application/cdmi-capability":["cdmia"],"application/cdmi-container":["cdmic"],"application/cdmi-domain":["cdmid"],"application/cdmi-object":["cdmio"],"application/cdmi-queue":["cdmiq"],"application/cu-seeme":["cu"],"application/dash+xml":["mpd"],"application/davmount+xml":["davmount"],"application/docbook+xml":["dbk"],"application/dssc+der":["dssc"],"application/dssc+xml":["xdssc"],"application/ecmascript":["ecma","es"],"application/emma+xml":["emma"],"application/emotionml+xml":["emotionml"],"application/epub+zip":["epub"],"application/exi":["exi"],"application/fdt+xml":["fdt"],"application/font-tdpfr":["pfr"],"application/geo+json":["geojson"],"application/gml+xml":["gml"],"application/gpx+xml":["gpx"],"application/gxf":["gxf"],"application/gzip":["gz"],"application/hjson":["hjson"],"application/hyperstudio":["stk"],"application/inkml+xml":["ink","inkml"],"application/ipfix":["ipfix"],"application/its+xml":["its"],"application/java-archive":["jar","war","ear"],"application/java-serialized-object":["ser"],"application/java-vm":["class"],"application/javascript":["js","mjs"],"application/json":["json","map"],"application/json5":["json5"],"application/jsonml+json":["jsonml"],"application/ld+json":["jsonld"],"application/lgr+xml":["lgr"],"application/lost+xml":["lostxml"],"application/mac-binhex40":["hqx"],"application/mac-compactpro":["cpt"],"application/mads+xml":["mads"],"application/manifest+json":["webmanifest"],"application/marc":["mrc"],"application/marcxml+xml":["mrcx"],"application/mathematica":["ma","nb","mb"],"application/mathml+xml":["mathml"],"application/mbox":["mbox"],"application/mediaservercontrol+xml":["mscml"],"application/metalink+xml":["metalink"],"application/metalink4+xml":["meta4"],"application/mets+xml":["mets"],"application/mmt-aei+xml":["maei"],"application/mmt-usd+xml":["musd"],"application/mods+xml":["mods"],"application/mp21":["m21","mp21"],"application/mp4":["mp4s","m4p"],"application/mrb-consumer+xml":["*xdf"],"application/mrb-publish+xml":["*xdf"],"application/msword":["doc","dot"],"application/mxf":["mxf"],"application/n-quads":["nq"],"application/n-triples":["nt"],"application/node":["cjs"],"application/octet-stream":["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy","exe","dll","deb","dmg","iso","img","msi","msp","msm","buffer"],"application/oda":["oda"],"application/oebps-package+xml":["opf"],"application/ogg":["ogx"],"application/omdoc+xml":["omdoc"],"application/onenote":["onetoc","onetoc2","onetmp","onepkg"],"application/oxps":["oxps"],"application/p2p-overlay+xml":["relo"],"application/patch-ops-error+xml":["*xer"],"application/pdf":["pdf"],"application/pgp-encrypted":["pgp"],"application/pgp-signature":["asc","sig"],"application/pics-rules":["prf"],"application/pkcs10":["p10"],"application/pkcs7-mime":["p7m","p7c"],"application/pkcs7-signature":["p7s"],"application/pkcs8":["p8"],"application/pkix-attr-cert":["ac"],"application/pkix-cert":["cer"],"application/pkix-crl":["crl"],"application/pkix-pkipath":["pkipath"],"application/pkixcmp":["pki"],"application/pls+xml":["pls"],"application/postscript":["ai","eps","ps"],"application/provenance+xml":["provx"],"application/pskc+xml":["pskcxml"],"application/raml+yaml":["raml"],"application/rdf+xml":["rdf","owl"],"application/reginfo+xml":["rif"],"application/relax-ng-compact-syntax":["rnc"],"application/resource-lists+xml":["rl"],"application/resource-lists-diff+xml":["rld"],"application/rls-services+xml":["rs"],"application/route-apd+xml":["rapd"],"application/route-s-tsid+xml":["sls"],"application/route-usd+xml":["rusd"],"application/rpki-ghostbusters":["gbr"],"application/rpki-manifest":["mft"],"application/rpki-roa":["roa"],"application/rsd+xml":["rsd"],"application/rss+xml":["rss"],"application/rtf":["rtf"],"application/sbml+xml":["sbml"],"application/scvp-cv-request":["scq"],"application/scvp-cv-response":["scs"],"application/scvp-vp-request":["spq"],"application/scvp-vp-response":["spp"],"application/sdp":["sdp"],"application/senml+xml":["senmlx"],"application/sensml+xml":["sensmlx"],"application/set-payment-initiation":["setpay"],"application/set-registration-initiation":["setreg"],"application/shf+xml":["shf"],"application/sieve":["siv","sieve"],"application/smil+xml":["smi","smil"],"application/sparql-query":["rq"],"application/sparql-results+xml":["srx"],"application/srgs":["gram"],"application/srgs+xml":["grxml"],"application/sru+xml":["sru"],"application/ssdl+xml":["ssdl"],"application/ssml+xml":["ssml"],"application/swid+xml":["swidtag"],"application/tei+xml":["tei","teicorpus"],"application/thraud+xml":["tfi"],"application/timestamped-data":["tsd"],"application/toml":["toml"],"application/ttml+xml":["ttml"],"application/ubjson":["ubj"],"application/urc-ressheet+xml":["rsheet"],"application/urc-targetdesc+xml":["td"],"application/voicexml+xml":["vxml"],"application/wasm":["wasm"],"application/widget":["wgt"],"application/winhlp":["hlp"],"application/wsdl+xml":["wsdl"],"application/wspolicy+xml":["wspolicy"],"application/xaml+xml":["xaml"],"application/xcap-att+xml":["xav"],"application/xcap-caps+xml":["xca"],"application/xcap-diff+xml":["xdf"],"application/xcap-el+xml":["xel"],"application/xcap-error+xml":["xer"],"application/xcap-ns+xml":["xns"],"application/xenc+xml":["xenc"],"application/xhtml+xml":["xhtml","xht"],"application/xliff+xml":["xlf"],"application/xml":["xml","xsl","xsd","rng"],"application/xml-dtd":["dtd"],"application/xop+xml":["xop"],"application/xproc+xml":["xpl"],"application/xslt+xml":["*xsl","xslt"],"application/xspf+xml":["xspf"],"application/xv+xml":["mxml","xhvml","xvml","xvm"],"application/yang":["yang"],"application/yin+xml":["yin"],"application/zip":["zip"],"audio/3gpp":["*3gpp"],"audio/adpcm":["adp"],"audio/amr":["amr"],"audio/basic":["au","snd"],"audio/midi":["mid","midi","kar","rmi"],"audio/mobile-xmf":["mxmf"],"audio/mp3":["*mp3"],"audio/mp4":["m4a","mp4a"],"audio/mpeg":["mpga","mp2","mp2a","mp3","m2a","m3a"],"audio/ogg":["oga","ogg","spx","opus"],"audio/s3m":["s3m"],"audio/silk":["sil"],"audio/wav":["wav"],"audio/wave":["*wav"],"audio/webm":["weba"],"audio/xm":["xm"],"font/collection":["ttc"],"font/otf":["otf"],"font/ttf":["ttf"],"font/woff":["woff"],"font/woff2":["woff2"],"image/aces":["exr"],"image/apng":["apng"],"image/avif":["avif"],"image/bmp":["bmp"],"image/cgm":["cgm"],"image/dicom-rle":["drle"],"image/emf":["emf"],"image/fits":["fits"],"image/g3fax":["g3"],"image/gif":["gif"],"image/heic":["heic"],"image/heic-sequence":["heics"],"image/heif":["heif"],"image/heif-sequence":["heifs"],"image/hej2k":["hej2"],"image/hsj2":["hsj2"],"image/ief":["ief"],"image/jls":["jls"],"image/jp2":["jp2","jpg2"],"image/jpeg":["jpeg","jpg","jpe"],"image/jph":["jph"],"image/jphc":["jhc"],"image/jpm":["jpm"],"image/jpx":["jpx","jpf"],"image/jxr":["jxr"],"image/jxra":["jxra"],"image/jxrs":["jxrs"],"image/jxs":["jxs"],"image/jxsc":["jxsc"],"image/jxsi":["jxsi"],"image/jxss":["jxss"],"image/ktx":["ktx"],"image/ktx2":["ktx2"],"image/png":["png"],"image/sgi":["sgi"],"image/svg+xml":["svg","svgz"],"image/t38":["t38"],"image/tiff":["tif","tiff"],"image/tiff-fx":["tfx"],"image/webp":["webp"],"image/wmf":["wmf"],"message/disposition-notification":["disposition-notification"],"message/global":["u8msg"],"message/global-delivery-status":["u8dsn"],"message/global-disposition-notification":["u8mdn"],"message/global-headers":["u8hdr"],"message/rfc822":["eml","mime"],"model/3mf":["3mf"],"model/gltf+json":["gltf"],"model/gltf-binary":["glb"],"model/iges":["igs","iges"],"model/mesh":["msh","mesh","silo"],"model/mtl":["mtl"],"model/obj":["obj"],"model/stl":["stl"],"model/vrml":["wrl","vrml"],"model/x3d+binary":["*x3db","x3dbz"],"model/x3d+fastinfoset":["x3db"],"model/x3d+vrml":["*x3dv","x3dvz"],"model/x3d+xml":["x3d","x3dz"],"model/x3d-vrml":["x3dv"],"text/cache-manifest":["appcache","manifest"],"text/calendar":["ics","ifb"],"text/coffeescript":["coffee","litcoffee"],"text/css":["css"],"text/csv":["csv"],"text/html":["html","htm","shtml"],"text/jade":["jade"],"text/jsx":["jsx"],"text/less":["less"],"text/markdown":["markdown","md"],"text/mathml":["mml"],"text/mdx":["mdx"],"text/n3":["n3"],"text/plain":["txt","text","conf","def","list","log","in","ini"],"text/richtext":["rtx"],"text/rtf":["*rtf"],"text/sgml":["sgml","sgm"],"text/shex":["shex"],"text/slim":["slim","slm"],"text/spdx":["spdx"],"text/stylus":["stylus","styl"],"text/tab-separated-values":["tsv"],"text/troff":["t","tr","roff","man","me","ms"],"text/turtle":["ttl"],"text/uri-list":["uri","uris","urls"],"text/vcard":["vcard"],"text/vtt":["vtt"],"text/xml":["*xml"],"text/yaml":["yaml","yml"],"video/3gpp":["3gp","3gpp"],"video/3gpp2":["3g2"],"video/h261":["h261"],"video/h263":["h263"],"video/h264":["h264"],"video/iso.segment":["m4s"],"video/jpeg":["jpgv"],"video/jpm":["*jpm","jpgm"],"video/mj2":["mj2","mjp2"],"video/mp2t":["ts"],"video/mp4":["mp4","mp4v","mpg4"],"video/mpeg":["mpeg","mpg","mpe","m1v","m2v"],"video/ogg":["ogv"],"video/quicktime":["qt","mov"],"video/webm":["webm"]};
-},{}],403:[function(require,module,exports){
+},{}],405:[function(require,module,exports){
 var crypto = require('crypto')
 
 function sha (key, body, algorithm) {
@@ -90048,7 +90299,7 @@ exports.plaintext = plaintext
 exports.sign = sign
 exports.rfc3986 = rfc3986
 exports.generateBase = generateBase
-},{"crypto":82}],404:[function(require,module,exports){
+},{"crypto":82}],406:[function(require,module,exports){
 'use strict';
 
 var replace = String.prototype.replace;
@@ -90068,7 +90319,7 @@ module.exports = {
     RFC3986: 'RFC3986'
 };
 
-},{}],405:[function(require,module,exports){
+},{}],407:[function(require,module,exports){
 'use strict';
 
 var stringify = require('./stringify');
@@ -90081,7 +90332,7 @@ module.exports = {
     stringify: stringify
 };
 
-},{"./formats":404,"./parse":406,"./stringify":407}],406:[function(require,module,exports){
+},{"./formats":406,"./parse":408,"./stringify":409}],408:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -90257,7 +90508,7 @@ module.exports = function (str, opts) {
     return utils.compact(obj);
 };
 
-},{"./utils":408}],407:[function(require,module,exports){
+},{"./utils":410}],409:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -90469,7 +90720,7 @@ module.exports = function (object, opts) {
     return joined.length > 0 ? prefix + joined : '';
 };
 
-},{"./formats":404,"./utils":408}],408:[function(require,module,exports){
+},{"./formats":406,"./utils":410}],410:[function(require,module,exports){
 'use strict';
 
 var has = Object.prototype.hasOwnProperty;
@@ -90684,7 +90935,7 @@ module.exports = {
     merge: merge
 };
 
-},{}],409:[function(require,module,exports){
+},{}],411:[function(require,module,exports){
 // Copyright 2010-2012 Mikeal Rogers
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -90841,7 +91092,7 @@ Object.defineProperty(request, 'debug', {
   }
 })
 
-},{"./lib/cookies":411,"./lib/helpers":415,"./request":422,"extend":315}],410:[function(require,module,exports){
+},{"./lib/cookies":413,"./lib/helpers":417,"./request":424,"extend":316}],412:[function(require,module,exports){
 'use strict'
 
 var caseless = require('caseless')
@@ -91010,7 +91261,7 @@ Auth.prototype.onResponse = function (response) {
 
 exports.Auth = Auth
 
-},{"./helpers":415,"caseless":386,"uuid/v4":433}],411:[function(require,module,exports){
+},{"./helpers":417,"caseless":388,"uuid/v4":435}],413:[function(require,module,exports){
 'use strict'
 
 var tough = require('tough-cookie')
@@ -91050,7 +91301,7 @@ exports.jar = function (store) {
   return new RequestJar(store)
 }
 
-},{"tough-cookie":423}],412:[function(require,module,exports){
+},{"tough-cookie":425}],414:[function(require,module,exports){
 (function (process){(function (){
 'use strict'
 
@@ -91133,7 +91384,7 @@ function getProxyFromURI (uri) {
 module.exports = getProxyFromURI
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":187}],413:[function(require,module,exports){
+},{"_process":187}],415:[function(require,module,exports){
 'use strict'
 
 var fs = require('fs')
@@ -91340,7 +91591,7 @@ Har.prototype.options = function (options) {
 
 exports.Har = Har
 
-},{"extend":315,"fs":1,"har-validator":390,"querystring":198}],414:[function(require,module,exports){
+},{"extend":316,"fs":1,"har-validator":392,"querystring":198}],416:[function(require,module,exports){
 'use strict'
 
 var crypto = require('crypto')
@@ -91431,7 +91682,7 @@ exports.header = function (uri, method, opts) {
   return header
 }
 
-},{"crypto":82}],415:[function(require,module,exports){
+},{"crypto":82}],417:[function(require,module,exports){
 (function (process,setImmediate){(function (){
 'use strict'
 
@@ -91501,7 +91752,7 @@ exports.version = version
 exports.defer = defer
 
 }).call(this)}).call(this,require('_process'),require("timers").setImmediate)
-},{"_process":187,"crypto":82,"json-stringify-safe":345,"safe-buffer":354,"timers":247}],416:[function(require,module,exports){
+},{"_process":187,"crypto":82,"json-stringify-safe":346,"safe-buffer":356,"timers":247}],418:[function(require,module,exports){
 'use strict'
 
 var uuid = require('uuid/v4')
@@ -91615,7 +91866,7 @@ Multipart.prototype.onRequest = function (options) {
 
 exports.Multipart = Multipart
 
-},{"combined-stream":387,"isstream":341,"safe-buffer":354,"uuid/v4":433}],417:[function(require,module,exports){
+},{"combined-stream":389,"isstream":342,"safe-buffer":356,"uuid/v4":435}],419:[function(require,module,exports){
 'use strict'
 
 var url = require('url')
@@ -91765,7 +92016,7 @@ OAuth.prototype.onRequest = function (_oauth) {
 
 exports.OAuth = OAuth
 
-},{"caseless":386,"crypto":82,"oauth-sign":403,"qs":405,"safe-buffer":354,"url":248,"uuid/v4":433}],418:[function(require,module,exports){
+},{"caseless":388,"crypto":82,"oauth-sign":405,"qs":407,"safe-buffer":356,"url":248,"uuid/v4":435}],420:[function(require,module,exports){
 'use strict'
 
 var qs = require('qs')
@@ -91817,7 +92068,7 @@ Querystring.prototype.unescape = querystring.unescape
 
 exports.Querystring = Querystring
 
-},{"qs":405,"querystring":198}],419:[function(require,module,exports){
+},{"qs":407,"querystring":198}],421:[function(require,module,exports){
 'use strict'
 
 var url = require('url')
@@ -91973,7 +92224,7 @@ Redirect.prototype.onResponse = function (response) {
 
 exports.Redirect = Redirect
 
-},{"url":248}],420:[function(require,module,exports){
+},{"url":248}],422:[function(require,module,exports){
 'use strict'
 
 var url = require('url')
@@ -92150,11 +92401,11 @@ Tunnel.defaultProxyHeaderWhiteList = defaultProxyHeaderWhiteList
 Tunnel.defaultProxyHeaderExclusiveList = defaultProxyHeaderExclusiveList
 exports.Tunnel = Tunnel
 
-},{"tunnel-agent":430,"url":248}],421:[function(require,module,exports){
+},{"tunnel-agent":432,"url":248}],423:[function(require,module,exports){
 /* eslint-env browser */
 module.exports = typeof self == 'object' ? self.FormData : window.FormData;
 
-},{}],422:[function(require,module,exports){
+},{}],424:[function(require,module,exports){
 (function (process){(function (){
 'use strict'
 
@@ -93711,7 +93962,7 @@ Request.prototype.toJSON = requestToJSON
 module.exports = Request
 
 }).call(this)}).call(this,require('_process'))
-},{"./lib/auth":410,"./lib/cookies":411,"./lib/getProxyFromURI":412,"./lib/har":413,"./lib/hawk":414,"./lib/helpers":415,"./lib/multipart":416,"./lib/oauth":417,"./lib/querystring":418,"./lib/redirect":419,"./lib/tunnel":420,"_process":187,"aws-sign2":385,"aws4":307,"caseless":386,"extend":315,"forever-agent":319,"form-data":421,"http":227,"http-signature":391,"https":151,"is-typedarray":340,"isstream":341,"mime-types":398,"performance-now":351,"safe-buffer":354,"stream":212,"url":248,"util":253,"zlib":69}],423:[function(require,module,exports){
+},{"./lib/auth":412,"./lib/cookies":413,"./lib/getProxyFromURI":414,"./lib/har":415,"./lib/hawk":416,"./lib/helpers":417,"./lib/multipart":418,"./lib/oauth":419,"./lib/querystring":420,"./lib/redirect":421,"./lib/tunnel":422,"_process":187,"aws-sign2":387,"aws4":307,"caseless":388,"extend":316,"forever-agent":320,"form-data":423,"http":227,"http-signature":393,"https":151,"is-typedarray":341,"isstream":342,"mime-types":400,"performance-now":353,"safe-buffer":356,"stream":212,"url":248,"util":253,"zlib":69}],425:[function(require,module,exports){
 /*!
  * Copyright (c) 2015, Salesforce.com, Inc.
  * All rights reserved.
@@ -95195,7 +95446,7 @@ exports.permuteDomain = require('./permuteDomain').permuteDomain;
 exports.permutePath = permutePath;
 exports.canonicalDomain = canonicalDomain;
 
-},{"./memstore":424,"./pathMatch":425,"./permuteDomain":426,"./pubsuffix-psl":427,"./store":428,"./version":429,"net":1,"punycode":195,"url":248,"util":253}],424:[function(require,module,exports){
+},{"./memstore":426,"./pathMatch":427,"./permuteDomain":428,"./pubsuffix-psl":429,"./store":430,"./version":431,"net":1,"punycode":195,"url":248,"util":253}],426:[function(require,module,exports){
 /*!
  * Copyright (c) 2015, Salesforce.com, Inc.
  * All rights reserved.
@@ -95378,7 +95629,7 @@ MemoryCookieStore.prototype.getAllCookies = function(cb) {
   cb(null, cookies);
 };
 
-},{"./pathMatch":425,"./permuteDomain":426,"./store":428,"util":253}],425:[function(require,module,exports){
+},{"./pathMatch":427,"./permuteDomain":428,"./store":430,"util":253}],427:[function(require,module,exports){
 /*!
  * Copyright (c) 2015, Salesforce.com, Inc.
  * All rights reserved.
@@ -95441,7 +95692,7 @@ function pathMatch (reqPath, cookiePath) {
 
 exports.pathMatch = pathMatch;
 
-},{}],426:[function(require,module,exports){
+},{}],428:[function(require,module,exports){
 /*!
  * Copyright (c) 2015, Salesforce.com, Inc.
  * All rights reserved.
@@ -95499,7 +95750,7 @@ function permuteDomain (domain) {
 
 exports.permuteDomain = permuteDomain;
 
-},{"./pubsuffix-psl":427}],427:[function(require,module,exports){
+},{"./pubsuffix-psl":429}],429:[function(require,module,exports){
 /*!
  * Copyright (c) 2018, Salesforce.com, Inc.
  * All rights reserved.
@@ -95539,7 +95790,7 @@ function getPublicSuffix(domain) {
 
 exports.getPublicSuffix = getPublicSuffix;
 
-},{"psl":353}],428:[function(require,module,exports){
+},{"psl":355}],430:[function(require,module,exports){
 /*!
  * Copyright (c) 2015, Salesforce.com, Inc.
  * All rights reserved.
@@ -95616,11 +95867,11 @@ Store.prototype.getAllCookies = function(cb) {
   throw new Error('getAllCookies is not implemented (therefore jar cannot be serialized)');
 };
 
-},{}],429:[function(require,module,exports){
+},{}],431:[function(require,module,exports){
 // generated by genversion
 module.exports = '2.5.0'
 
-},{}],430:[function(require,module,exports){
+},{}],432:[function(require,module,exports){
 (function (process){(function (){
 'use strict'
 
@@ -95868,7 +96119,7 @@ if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
 exports.debug = debug // for test
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":187,"assert":17,"events":112,"http":227,"https":151,"net":1,"safe-buffer":354,"tls":1,"util":253}],431:[function(require,module,exports){
+},{"_process":187,"assert":17,"events":112,"http":227,"https":151,"net":1,"safe-buffer":356,"tls":1,"util":253}],433:[function(require,module,exports){
 /**
  * Convert array of 16 byte values to UUID string format of the form:
  * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
@@ -95896,7 +96147,7 @@ function bytesToUuid(buf, offset) {
 
 module.exports = bytesToUuid;
 
-},{}],432:[function(require,module,exports){
+},{}],434:[function(require,module,exports){
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
@@ -95932,7 +96183,7 @@ if (getRandomValues) {
   };
 }
 
-},{}],433:[function(require,module,exports){
+},{}],435:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -95963,7 +96214,7 @@ function v4(options, buf, offset) {
 
 module.exports = v4;
 
-},{"./lib/bytesToUuid":431,"./lib/rng":432}],434:[function(require,module,exports){
+},{"./lib/bytesToUuid":433,"./lib/rng":434}],436:[function(require,module,exports){
 /** @license URI.js v4.4.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -97408,7 +97659,158 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 
 
-},{}],435:[function(require,module,exports){
+},{}],437:[function(require,module,exports){
+/*!
+ * vary
+ * Copyright(c) 2014-2017 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+'use strict'
+
+/**
+ * Module exports.
+ */
+
+module.exports = vary
+module.exports.append = append
+
+/**
+ * RegExp to match field-name in RFC 7230 sec 3.2
+ *
+ * field-name    = token
+ * token         = 1*tchar
+ * tchar         = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+ *               / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+ *               / DIGIT / ALPHA
+ *               ; any VCHAR, except delimiters
+ */
+
+var FIELD_NAME_REGEXP = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/
+
+/**
+ * Append a field to a vary header.
+ *
+ * @param {String} header
+ * @param {String|Array} field
+ * @return {String}
+ * @public
+ */
+
+function append (header, field) {
+  if (typeof header !== 'string') {
+    throw new TypeError('header argument is required')
+  }
+
+  if (!field) {
+    throw new TypeError('field argument is required')
+  }
+
+  // get fields array
+  var fields = !Array.isArray(field)
+    ? parse(String(field))
+    : field
+
+  // assert on invalid field names
+  for (var j = 0; j < fields.length; j++) {
+    if (!FIELD_NAME_REGEXP.test(fields[j])) {
+      throw new TypeError('field argument contains an invalid header name')
+    }
+  }
+
+  // existing, unspecified vary
+  if (header === '*') {
+    return header
+  }
+
+  // enumerate current values
+  var val = header
+  var vals = parse(header.toLowerCase())
+
+  // unspecified vary
+  if (fields.indexOf('*') !== -1 || vals.indexOf('*') !== -1) {
+    return '*'
+  }
+
+  for (var i = 0; i < fields.length; i++) {
+    var fld = fields[i].toLowerCase()
+
+    // append value (case-preserving)
+    if (vals.indexOf(fld) === -1) {
+      vals.push(fld)
+      val = val
+        ? val + ', ' + fields[i]
+        : fields[i]
+    }
+  }
+
+  return val
+}
+
+/**
+ * Parse a vary header into an array.
+ *
+ * @param {String} header
+ * @return {Array}
+ * @private
+ */
+
+function parse (header) {
+  var end = 0
+  var list = []
+  var start = 0
+
+  // gather tokens
+  for (var i = 0, len = header.length; i < len; i++) {
+    switch (header.charCodeAt(i)) {
+      case 0x20: /*   */
+        if (start === end) {
+          start = end = i + 1
+        }
+        break
+      case 0x2c: /* , */
+        list.push(header.substring(start, end))
+        start = end = i + 1
+        break
+      default:
+        end = i + 1
+        break
+    }
+  }
+
+  // final token
+  list.push(header.substring(start, end))
+
+  return list
+}
+
+/**
+ * Mark that a request is varied on a header field.
+ *
+ * @param {Object} res
+ * @param {String|Array} field
+ * @public
+ */
+
+function vary (res, field) {
+  if (!res || !res.getHeader || !res.setHeader) {
+    // quack quack
+    throw new TypeError('res argument is required')
+  }
+
+  // get existing header
+  var val = res.getHeader('Vary') || ''
+  var header = Array.isArray(val)
+    ? val.join(', ')
+    : String(val)
+
+  // set new header
+  if ((val = append(header, field))) {
+    res.setHeader('Vary', val)
+  }
+}
+
+},{}],438:[function(require,module,exports){
 /*
  * verror.js: richer JavaScript errors
  */
@@ -97861,9 +98263,9 @@ WError.prototype.cause = function we_cause(c)
 	return (this.jse_cause);
 };
 
-},{"assert-plus":436,"core-util-is":437,"extsprintf":316,"util":253}],436:[function(require,module,exports){
-arguments[4][347][0].apply(exports,arguments)
-},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":347,"stream":212,"util":253}],437:[function(require,module,exports){
+},{"assert-plus":439,"core-util-is":440,"extsprintf":317,"util":253}],439:[function(require,module,exports){
+arguments[4][348][0].apply(exports,arguments)
+},{"C:/Users/chestha/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":155,"_process":187,"assert":17,"dup":348,"stream":212,"util":253}],440:[function(require,module,exports){
 (function (Buffer){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //

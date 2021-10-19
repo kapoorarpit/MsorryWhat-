@@ -111,8 +111,17 @@ var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
 
 req.headers({
   "authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
-  'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+  "Access-Control-Allow-Methods": "*"
 });
+
+const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
+}
+
+req.use(cors(corsOptions))
 
 req.form({
   "message": message,
