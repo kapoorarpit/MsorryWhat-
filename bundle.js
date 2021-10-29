@@ -39576,10 +39576,11 @@ var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
 
 //require('dotenv').config()
 
-req.headers({
+req.setHeaders({
   "authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
   "Access-Control-Allow-Methods": "*"
 });
+
 
 req.form({
   "message": message,
