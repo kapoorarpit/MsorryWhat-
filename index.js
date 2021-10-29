@@ -112,6 +112,8 @@ var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
 req.headers({
   "authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+  "Access-Control-Allow-Credentials": true,
 });
 
 
