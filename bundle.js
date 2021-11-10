@@ -39572,7 +39572,7 @@ function notify(message,contact){
 
 var unirest = (require("unirest"));
 
-var req = unirest("POST", "https://www.fast2sms.com/dev/bulkV2")
+var req = unirest("POST", "https://cors-anywhere.herokuapp.com/https://www.fast2sms.com/dev/bulkV2")
 
 //require('dotenv').config()
 
@@ -39593,11 +39593,12 @@ req.form({
   "route": "q",
   "numbers": contact,
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+  "Access-Control-Allow-Methods": "*",
   "Access-Control-Allow-Credentials": true,
-  "Access-Control-Allow-Headers": "Access-Control-Allow-Headers",
+  "Access-Control-Allow-Headers": "*",
   "Cache-Control": "no-cache",
   "X-Requested-With": null,
+  mode :"no-cors",
 });
 
 req.end(function (res) {
