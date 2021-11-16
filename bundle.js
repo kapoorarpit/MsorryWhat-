@@ -39572,18 +39572,14 @@ function notify(message,contact){
 
 var unirest = (require("unirest"));
 
-var req = unirest("POST", "https://cors-anywhere.herokuapp.com/https://www.fast2sms.com/dev/bulkV2")
+var req = unirest("POST", "https://myproxxyserver.herokuapp.com/https://www.fast2sms.com/dev/bulkV2")
 
 //require('dotenv').config()
+//browserify index.js -o bundle.js
 
 req.headers({
   "Authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "*",
-  "Access-Control-Allow-Credentials": true,
-  "Access-Control-Allow-Headers": "*",
-  "Cache-Control": "no-cache",
-  "X-Requested-With": null,
+  
 });
 
 
@@ -39592,13 +39588,6 @@ req.form({
   "language": "english",
   "route": "q",
   "numbers": contact,
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "*",
-  "Access-Control-Allow-Credentials": true,
-  "Access-Control-Allow-Headers": "*",
-  "Cache-Control": "no-cache",
-  "X-Requested-With": null,
-  mode :"no-cors",
 });
 
 req.end(function (res) {

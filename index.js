@@ -105,7 +105,7 @@ function notify(message,contact){
 
 var unirest = (require("unirest"));
 
-var req = unirest("POST", "https://cors-anywhere.herokuapp.com/https://www.fast2sms.com/dev/bulkV2")
+var req = unirest("POST", "https://myproxxyserver.herokuapp.com/https://www.fast2sms.com/dev/bulkV2")
 
 //require('dotenv').config()
 //browserify index.js -o bundle.js
