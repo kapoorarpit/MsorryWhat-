@@ -126,5 +126,10 @@ req.form({
 req.end(function (res) {
   if (res.error) throw new Error(res.error);
 
+  var today = new Date();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   console.log(res.body);
+  document.getElementById("notify").innerHTML="Hi "+ username +"! notified you on your contact number -"+ contact +
+                                                "  !as someone called you in the meeting at"+ time
+
 });}
