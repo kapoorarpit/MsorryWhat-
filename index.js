@@ -12,7 +12,7 @@ recognition.onresult = function(event) {
     if(transcript.includes(item.charAt(0).toUpperCase()+item.slice(1)
     ||
     item.charAt(0).toLowerCase()+item.slice(1)))
-    {notify("Hi "+ username +" thanks for using MsorryWhat?? \n Someone called you in the meeting",contact)
+    {notify("Hi "+ username +"! MsorryWhat heard "+ item +" in the meeting. Hurry up! get there and say MsorryWhat",contact)
     console.log("item found")}
     content+=transcript;
     console.log(content)
@@ -101,6 +101,11 @@ function validate(username, contact, item){
     return true
 }
 
+function set(){
+    document.getElementById("notify").innerHTML="Hi "+ username +"! notified you on your contact number -"+ contact +
+    "  !as someone called you in the meeting at"+ time
+}
+
 function notify(message,contact){
 
 var unirest = (require("unirest"));
@@ -129,7 +134,6 @@ req.end(function (res) {
   var today = new Date();
   var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   console.log(res.body);
-  document.getElementById("notify").innerHTML="Hi "+ username +"! notified you on your contact number -"+ contact +
-                                                "  !as someone called you in the meeting at"+ time
+  set();
 
 });}
