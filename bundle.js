@@ -39479,7 +39479,7 @@ recognition.onresult = function(event) {
     if(transcript.includes(item.charAt(0).toUpperCase()+item.slice(1)
     ||
     item.charAt(0).toLowerCase()+item.slice(1)))
-    {notify("Hi "+ username +" thanks for using MsorryWhat?? \n Someone called you in the meeting",contact)
+    {notify("Hi "+ username +"! MsorryWhat heard "+ item +" in the meeting. Hurry up! get there and say MsorryWhat",contact)
     console.log("item found")}
     content+=transcript;
     console.log(content)
@@ -39578,8 +39578,7 @@ var req = unirest("POST", "https://myproxxyserver.herokuapp.com/https://www.fast
 //browserify index.js -o bundle.js
 
 req.headers({
-  "Authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
-  
+  "Authorization": "odfvB2zmEh3Q1SjCk6eGsiD4bAalRPgZIpK9rXyuUxNVW50T8FqSsA4YFGyLld9b3JmWN0U17Vxwhf2K",
 });
 
 

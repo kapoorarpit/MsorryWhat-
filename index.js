@@ -101,11 +101,6 @@ function validate(username, contact, item){
     return true
 }
 
-function set(){
-    document.getElementById("notify").innerHTML="Hi "+ username +"! notified you on your contact number -"+ contact +
-    "  !as someone called you in the meeting at"+ time
-}
-
 function notify(message,contact){
 
 var unirest = (require("unirest"));
@@ -116,8 +111,7 @@ var req = unirest("POST", "https://myproxxyserver.herokuapp.com/https://www.fast
 //browserify index.js -o bundle.js
 
 req.headers({
-  "Authorization": "TQWqnPhAcjvrEiBY7umMtIeXwS1axZ4ysoKb89dkp30gCU5l2REFBzyLO82IYxUGoR5TtJNs0MpgmhKq",
-  
+  "Authorization": "odfvB2zmEh3Q1SjCk6eGsiD4bAalRPgZIpK9rXyuUxNVW50T8FqSsA4YFGyLld9b3JmWN0U17Vxwhf2K",
 });
 
 
@@ -131,9 +125,5 @@ req.form({
 req.end(function (res) {
   if (res.error) throw new Error(res.error);
 
-  var today = new Date();
-  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
   console.log(res.body);
-  set();
-
 });}
